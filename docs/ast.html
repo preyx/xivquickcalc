@@ -8,7 +8,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>SCH QuickCalc</title>
+    <title>AST QuickCalc</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Google Fonts -->
@@ -23,10 +23,10 @@
     <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
+    <p></p>
     <div class="container">
-        <p></p>
         <div class="row">
-            <h1>SCH Stat Calculator ver 6.05</h1>
+            <h1>AST Stat Calculator ver 6.05</h1>
         </div>
         <div class="row">
             <div class="column">
@@ -144,14 +144,14 @@
         var dmg = 0, mnd = 0, pie = 0, dh = 0, crt = 0, det = 0, sps = 0;
         var gcd = 0, crate = 0, cdmg = 0, dhrate = 0, detdmg = 0, mpmin = 0, mpup = 0, avgdps = 0, avghps = 0, ppsx = 0, reldps = 0, relhps = 0;
         var refdmg = 0, refmnd = 0, refpie = 0, refdh = 0, refdet = 0, refsps = 0, refdps = 0, refhps = 0, refgcd = 0, refpps = 0;
-        var ruin2rate = 0, succorrate = 0, adlorate = 0, energydrainrate = 4, resrate = 0;
+        var ahrate = 1, abrate = 1, dynerate = 1, resrate = 0;
         const setSavage = [120, 2572, 1089, 400, 1651, 1514, 562], setTome = [119, 2564, 1114, 400, 1553, 1542, 602];
 
-        // SCH SPELL POTENCIES
-        const R2 = 220;
-        const B4 = 295;
-        const BioDot = 70;
-        const energyDrain = 100;
+        // AST SPELL POTENCIES
+        const m4 = 250
+        const combustDot = 55
+        const star = 279
+        const lord = 125
 
         // PARTY BUFF VALUES
         const battleVoiceAvg = 0.025;
@@ -192,57 +192,56 @@
         // MP RELATED CALCULATIONS
 
         // Average potency of a 180s rotation
-        function getP(shortGcd, R2s, sps, ED, filler, cycle) {
-            var result = ED * energyDrain * 60 / cycle;
-            // 1 bio + x B4
-            if (B4 > BioDot / 3 * SpsScalar(sps) * Math.floor(30 / shortGcd) * (shortGcd - 30 % shortGcd)) {
-                result += 6 * (Math.ceil(30 / shortGcd) - 1) * B4;
-                result -= (B4 - R2) * R2s * cycle / 60;
-                result += 60 * SpsScalar(sps) * BioDot;
+        function getP(sps, shortGcd, filler, cycle, dyne) {
+            var result = star * cycle / 60 + lord * cycle / 60;
+            if (m4 > combustDot / 3 * SpsScalar(sps) * Math.floor(30 / shortGcd) * (shortGcd - 30 % shortGcd)) {
+                result += 6 * (Math.ceil(30 / shortGcd) - 1) * m4;
+                result += 60 * SpsScalar(sps) * combustDot;
             } else {
-                result += 6 * (Math.floor(30 / shortGcd) - 1) * B4;
-                result -= (B4 - R2) * R2s * 60 / cycle;
-                result += 54 * SpsScalar(sps) * BioDot;
-                result += 6 * ((3 - (30 % shortGcd)) / 3) * SpsScalar(sps) * BioDot;
+                result += 6 * (Math.floor(30 / shortGcd) - 1) * m4;
+                result += 54 * SpsScalar(sps) * combustDot;
+                result += 6 * ((3 - (30 % shortGcd)) / 3) * SpsScalar(sps) * combustDot;
             }
-            result -= filler * B4 * cycle / 60;
+            result -= filler * m4 * cycle / 60;
             return result;
         }
 
-        function getMP(gcd, sps, suc, adlo, ED, rezz, cycle) {
+        function getMP(shortGcd, sps, AH, AB, rezz, cycle, dyne) {
             var result = 0;
-            if (B4 > BioDot / 3 * SpsScalar(sps) * Math.floor(30 / gcd) * (gcd - 30 % gcd)) {
-                result = Math.ceil(30 / gcd) * 2400;
+            if (m4 > combustDot / 3 * SpsScalar(sps) * Math.floor(30 / shortGcd) * (shortGcd - 30 % shortGcd)) {
+                result += Math.ceil(30 / shortGcd) * 2400;
             } else {
-                result = Math.floor(30 / gcd) * 2400;
+                result += Math.floor(30 / shortGcd) * 2400;
             }
-            return result + suc * cycle * 10 + adlo * cycle * 10 + rezz * cycle * 33.333 - cycle * 33.333 - cycle * 64.167;
+            return result + (AH * 6.6667 + rezz * 33.333 - 108.611) * cycle;
         }
 
         // Actual time taken by a 180s rotation
-        function getCycle(shortGcd, sps) {
+        function getCycle(shortGcd, sps, dyne) {
             var result = 0;
-            // 1 bio + x Broils
-            if (B4 > BioDot / 3 * SpsScalar(sps) * Math.floor(30 / shortGcd) * (shortGcd - 30 % shortGcd)) {
-                result = 6 * Math.ceil(30 / shortGcd) * shortGcd;
+            //1 combust + x M4s
+            if (m4 > combustDot / 3 * SpsScalar(sps) * Math.floor(30 / shortGcd) * (shortGcd - 30 % shortGcd)) {
+                result += 6 * Math.ceil(30 / shortGcd) * shortGcd; // More than 1.5s left on Combust, do extra Malefic (cycle > 180)
             } else {
-                result = 6 * Math.floor(30 / shortGcd) * shortGcd;
+                result += 6 * Math.floor(30 / shortGcd) * shortGcd; // Less than 1.5s left on Combust, no extra Malefic (cycle <= 180)
             }
+            // astrodyne as multiplier normalized over 90s
+            result *= 90 / (dyne * 1.6667 + 90);
             return result;
         }
 
-        function pps(gcd, sps, r2, suc, adlo, ED, rezz) {
-            var cycle = getCycle(gcd, sps);
-            return getP(gcd, r2, sps, ED, suc + adlo + rezz, cycle) / cycle;
+        function pps(sps, gcd, AH, AB, rezz, dyne) {
+            var cycle = getCycle(gcd, sps, dyne);
+            return getP(sps, gcd, AH + AB + rezz, cycle, dyne) / cycle;
         }
 
-        function mpps(gcd, sps, suc, adlo, ED, rezz) {
-            var cycle = getCycle(gcd, sps);
-            return getMP(gcd, sps, suc, adlo, ED, rezz, cycle) / cycle;
+        function mpps(gcd, pie, sps, AH, AB, rezz, dyne) {
+            var cycle = getCycle(gcd, sps, dyne);
+            return getMP(gcd, sps, AH, AB, rezz, cycle, dyne) / cycle;
         }
 
-        function MPTime(pie, gcd, sps, suc, adlo, ED, rezz) {
-            var result = CalcPiety(pie) / 3 - mpps(gcd, sps, suc, adlo, ED, rezz);
+        function MPTime(pie, gcd, sps, AH, AB, rezz, dyne) {
+            var result = CalcPiety(pie) / 3 - mpps(gcd, pie, sps, AH, AB, rezz, dyne);
             return Math.floor(-10000 / result);
         }
 
@@ -291,6 +290,7 @@
                 // 404, couldn't get the set
                 return false;
             }
+
             response = response.totalParams;
 
             return [
@@ -320,19 +320,19 @@
 
         function getID(ID) {
             var temp = document.querySelector('#' + ID).valueAsNumber;
-            return (temp > 0 && temp < 9999) ? temp : 0;
+            return (temp > 0 && temp < 10000) ? temp : 0;
         }
 
         function getDPS() {
             if (sps) {
                 gcd = Math.floor(0.250 * (1000 - Math.floor(130 * (sps - 400) / 1900))) / 100;
-                ppsx = pps(gcd, sps, ruin2rate, succorrate, adlorate, energydrainrate, resrate);
+                ppsx = pps(sps, gcd, ahrate, abrate, resrate, dynerate);
                 writeID('gcd', gcd.toFixed(2) + 's');
             } else {
                 writeID('gcd', '- . - - s');
             }
             if (pie && sps) {
-                if ((mpmin = (20 * CalcPiety(pie)) - (60 * mpps(gcd, sps, succorrate, adlorate, energydrainrate, resrate))) < 0 && ((mpup = MPTime(pie, gcd, sps, succorrate, adlorate, energydrainrate, resrate)) < 3600)) {
+                if ((mpmin = (20 * CalcPiety(pie)) - (60 * mpps(gcd, pie, sps, ahrate, abrate, resrate, dynerate))) < 0 && ((mpup = MPTime(pie, gcd, sps, ahrate, abrate, resrate, dynerate)) < 3600)) {
                     writeID('mpup', new Date(mpup * 1000).toISOString().substr(14, 5) + 'min')
                 } else {
                     writeID('mpup', '- - : - - min')
@@ -364,7 +364,7 @@
                 writeID('detdmg', '- - - . - %');
             }
             if (dmg && mnd && dh && crt && det && ppsx) {
-                avgdps = Damage(ppsx, dmg, 115, mnd, det, crt, dh, false, false, true, false, 5);
+                avgdps = Damage(ppsx, dmg, 115, mnd, det, crt, dh, false, false, false, false, 5);
                 avghps = Healing(100, dmg, 115, mnd, det, 5);
                 writeID('avgdps', avgdps.toFixed(1) + 'dps');
             } else {
@@ -396,8 +396,8 @@
             refsps = getID('refsps');
             if (refdmg && refmnd && refpie && refdh && refcrt && refdet && refsps) {
                 refgcd = Math.floor(0.250 * (1000 - Math.floor(130 * (refsps - 400) / 1900))) / 100;
-                refpps = pps(refgcd, refsps, ruin2rate, succorrate, adlorate, energydrainrate, resrate);
-                refdps = Damage(refpps, refdmg, 115, refmnd, refdet, refcrt, refdh, false, false, true, false, 5);
+                refpps = pps(refsps, refgcd, ahrate, abrate, resrate, dynerate);
+                refdps = Damage(refpps, refdmg, 115, refmnd, refdet, refcrt, refdh, false, false, false, false, 5);
                 refhps = Healing(100, refdmg, 115, refmnd, refdet, 5);
             } else {
                 refdps = refhps = 0;

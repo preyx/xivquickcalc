@@ -11,24 +11,20 @@
     <title>WHM QuickCalc</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!--<link rel="stylesheet" href="">-->
     <!-- Google Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
-
     <!-- CSS Reset -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
-
     <!-- Milligram CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
-
-    <!-- You should properly set the path from the main file. -->
+</head>
 
 <body>
     <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
-    <p></p>
     <div class="container">
+        <p></p>
         <div class="row">
             <h1>WHM Stat Calculator ver 6.05</h1>
         </div>
@@ -38,10 +34,6 @@
                 <h4>Reference Stats</h4>
                 <button class="button" id="setsvg">Use Savage Gearset</button>
                 <button class="button" id="settome">Use Tome Gearset</button>
-                <button class="button" id="clearref">Clear Stats</button>
-                <p></p>
-                <h4>Your Stats</h4>
-                <button class="button" id="clearstat">Clear Stats</button>
                 <p></p>
                 <h4>Import Data</h4>
                 <form onkeypress="etrosubmit(event)">
@@ -461,53 +453,38 @@
         document.onload = writeRef(setSavage);
 
         function etrosubmit(event) {
-            event.preventDefault();
             if (event.key.includes('Enter')) {
+                event.preventDefault();
                 document.querySelector('#importstat').dispatchEvent(new Event('click'));
             }
         }
 
         document.querySelector('#dmg').addEventListener('change', (event) => {
-            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
-                dmg = event.target.valueAsNumber;
-                getDPS();
-            }
+            if (dmg = getID('dmg')) getDPS();
         })
+
         document.querySelector('#mnd').addEventListener('change', (event) => {
-            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
-                mnd = event.target.valueAsNumber;
-                getDPS();
-            }
+            if (mnd = getID('mnd')) getDPS();
         })
+
         document.querySelector('#pie').addEventListener('change', (event) => {
-            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
-                pie = event.target.valueAsNumber;
-                getDPS();
-            }
+            if (pie = getID('pie')) getDPS();
         })
+
         document.querySelector('#dh').addEventListener('change', (event) => {
-            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
-                dh = event.target.valueAsNumber;
-                getDPS();
-            }
+            if (dh = getID('dh')) getDPS();
         })
+
         document.querySelector('#crt').addEventListener('change', (event) => {
-            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
-                crt = event.target.valueAsNumber;
-                getDPS();
-            }
+            if (crt = getID('crt')) getDPS();
         })
+
         document.querySelector('#det').addEventListener('change', (event) => {
-            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
-                det = event.target.valueAsNumber;
-                getDPS();
-            }
+            if (det = getID('det')) getDPS();
         })
+
         document.querySelector('#sps').addEventListener('change', (event) => {
-            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
-                sps = event.target.valueAsNumber;
-                getDPS();
-            }
+            if (sps = getID('sps')) getDPS();
         })
 
         document.querySelector('#calcref').addEventListener('click', (event) => {
@@ -524,14 +501,6 @@
 
         document.querySelector('#settome').addEventListener('click', (event) => {
             writeRef(setTome);
-        })
-
-        document.querySelector('#clearref').addEventListener('click', (event) => {
-            writeRef([0, 0, 0, 0, 0, 0, 0]);
-        })
-
-        document.querySelector('#clearstat').addEventListener('click', (event) => {
-            writeStats([0, 0, 0, 0, 0, 0, 0]);
         })
 
         document.querySelector('#importref').addEventListener('click', async (event) => {
