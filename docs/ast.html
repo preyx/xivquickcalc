@@ -193,7 +193,7 @@
 
         // Average potency of a 180s rotation
         function getP(sps, shortGcd, filler, cycle, dyne) {
-            var result = star * cycle / 60 + lord * cycle / 60;
+            let result = star * cycle / 60 + lord * cycle / 60;
             if (m4 > combustDot / 3 * SpsScalar(sps) * Math.floor(30 / shortGcd) * (shortGcd - 30 % shortGcd)) {
                 result += 6 * (Math.ceil(30 / shortGcd) - 1) * m4;
                 result += 60 * SpsScalar(sps) * combustDot;
@@ -207,7 +207,7 @@
         }
 
         function getMP(shortGcd, sps, AH, AB, rezz, cycle, dyne) {
-            var result = 0;
+            let result = 0;
             if (m4 > combustDot / 3 * SpsScalar(sps) * Math.floor(30 / shortGcd) * (shortGcd - 30 % shortGcd)) {
                 result += Math.ceil(30 / shortGcd) * 2400;
             } else {
@@ -218,7 +218,7 @@
 
         // Actual time taken by a 180s rotation
         function getCycle(shortGcd, sps, dyne) {
-            var result = 0;
+            let result = 0;
             //1 combust + x M4s
             if (m4 > combustDot / 3 * SpsScalar(sps) * Math.floor(30 / shortGcd) * (shortGcd - 30 % shortGcd)) {
                 result += 6 * Math.ceil(30 / shortGcd) * shortGcd; // More than 1.5s left on Combust, do extra Malefic (cycle > 180)
@@ -231,17 +231,17 @@
         }
 
         function pps(sps, gcd, AH, AB, rezz, dyne) {
-            var cycle = getCycle(gcd, sps, dyne);
+            let cycle = getCycle(gcd, sps, dyne);
             return getP(sps, gcd, AH + AB + rezz, cycle, dyne) / cycle;
         }
 
         function mpps(gcd, pie, sps, AH, AB, rezz, dyne) {
-            var cycle = getCycle(gcd, sps, dyne);
+            let cycle = getCycle(gcd, sps, dyne);
             return getMP(gcd, sps, AH, AB, rezz, cycle, dyne) / cycle;
         }
 
         function MPTime(pie, gcd, sps, AH, AB, rezz, dyne) {
-            var result = CalcPiety(pie) / 3 - mpps(gcd, pie, sps, AH, AB, rezz, dyne);
+            let result = CalcPiety(pie) / 3 - mpps(gcd, pie, sps, AH, AB, rezz, dyne);
             return Math.floor(-10000 / result);
         }
 
@@ -251,19 +251,19 @@
 
         // DPS AND HPS RELATED CALCULATIONS
         function Damage(Potency, WD, JobMod, MainStat, Det, Crit, DH, hasBrd, hasDrg, hasSch, hasDnc, classNum) {
-            var myStat = Math.floor(MainStat * (1 + 0.01 * classNum));
-            var myDmg = Math.floor(Potency * (WD + Math.floor(baseMain * JobMod / 1000)) * (100 + Math.floor((myStat - baseMain) * 195 / baseMain)) / 100);
+            let myStat = Math.floor(MainStat * (1 + 0.01 * classNum));
+            let myDmg = Math.floor(Potency * (WD + Math.floor(baseMain * JobMod / 1000)) * (100 + Math.floor((myStat - baseMain) * 195 / baseMain)) / 100);
             myDmg = Math.floor(myDmg * CalcDetDamage(Det));
             myDmg = Math.floor(myDmg * magicAndMend);
-            var CritDamage = CalcCritDamage(Crit);
-            var CritRate = CalcCritRate(Crit) + (hasDrg ? battleLitanyAvg : 0) + (hasSch ? chainStratAvg : 0) + (hasDnc ? devilmentAvg : 0) + (hasBrd ? brdCritAvg : 0);
-            var DHRate = CalcDHRate(DH) + (hasBrd ? battleVoiceAvg + brdDhAvg : 0) + (hasDnc ? devilmentAvg : 0);
+            let CritDamage = CalcCritDamage(Crit);
+            let CritRate = CalcCritRate(Crit) + (hasDrg ? battleLitanyAvg : 0) + (hasSch ? chainStratAvg : 0) + (hasDnc ? devilmentAvg : 0) + (hasBrd ? brdCritAvg : 0);
+            let DHRate = CalcDHRate(DH) + (hasBrd ? battleVoiceAvg + brdDhAvg : 0) + (hasDnc ? devilmentAvg : 0);
             return myDmg * (1 + (DHRate / 4)) * (1 + (CritRate * CritDamage)) / 100;
         }
 
         function Healing(Potency, WD, JobMod, MainStat, Det, classNum) {
-            var myStat = Math.floor(MainStat * (1 + 0.01 * classNum));
-            var myDmg = Math.floor(Potency * (WD + Math.floor(baseMain * JobMod / 1000)) * (100 + Math.floor((myStat - baseMain) * 569 / 1522)) / 100);
+            let myStat = Math.floor(MainStat * (1 + 0.01 * classNum));
+            let myDmg = Math.floor(Potency * (WD + Math.floor(baseMain * JobMod / 1000)) * (100 + Math.floor((myStat - baseMain) * 569 / 1522)) / 100);
             myDmg = Math.floor(myDmg * CalcDetDamage(Det));
             myDmg = Math.floor(myDmg * magicAndMend);
             return myDmg / 100;
@@ -305,7 +305,7 @@
         }
 
         async function getJson(setID) {
-            var response = await fetch(`https://etro.gg/api/gearsets/${gearset}/`)
+            let response = await fetch(`https://etro.gg/api/gearsets/${gearset}/`)
             return await response.json();
         }
 
@@ -319,7 +319,7 @@
         }
 
         function getID(ID) {
-            var temp = document.querySelector('#' + ID).valueAsNumber;
+            let temp = document.querySelector('#' + ID).valueAsNumber;
             return (temp > 0 && temp < 10000) ? temp : 0;
         }
 
@@ -484,8 +484,8 @@
         })
 
         document.querySelector('#importref').addEventListener('click', async (event) => {
-            var myUrl = document.querySelector('#etrolink').value.substr(0, 100);
-            var result = await get_set_from_etro(myUrl);
+            let myUrl = document.querySelector('#etrolink').value.substr(0, 100);
+            let result = await get_set_from_etro(myUrl);
             if (result) {
                 writeID('importstatus', 'Last import: GOOD!');
                 writeRef(result);
@@ -495,8 +495,8 @@
         })
 
         document.querySelector('#importstat').addEventListener('click', async (event) => {
-            var myUrl = document.querySelector('#etrolink').value.substr(0, 100);
-            var result = await get_set_from_etro(myUrl);
+            let myUrl = document.querySelector('#etrolink').value.substr(0, 100);
+            let result = await get_set_from_etro(myUrl);
             if (result) {
                 writeID('importstatus', 'Last import: GOOD!');
                 writeStats(result);

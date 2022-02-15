@@ -193,7 +193,7 @@
 
         // Average potency of a 180s rotation
         function getP(shortGcd, R2s, sps, ED, filler, cycle) {
-            var result = ED * energyDrain * 60 / cycle;
+            let result = ED * energyDrain * 60 / cycle;
             // 1 bio + x B4
             if (B4 > BioDot / 3 * SpsScalar(sps) * Math.floor(30 / shortGcd) * (shortGcd - 30 % shortGcd)) {
                 result += 6 * (Math.ceil(30 / shortGcd) - 1) * B4;
@@ -210,7 +210,7 @@
         }
 
         function getMP(gcd, sps, suc, adlo, ED, rezz, cycle) {
-            var result = 0;
+            let result = 0;
             if (B4 > BioDot / 3 * SpsScalar(sps) * Math.floor(30 / gcd) * (gcd - 30 % gcd)) {
                 result = Math.ceil(30 / gcd) * 2400;
             } else {
@@ -221,7 +221,7 @@
 
         // Actual time taken by a 180s rotation
         function getCycle(shortGcd, sps) {
-            var result = 0;
+            let result = 0;
             // 1 bio + x Broils
             if (B4 > BioDot / 3 * SpsScalar(sps) * Math.floor(30 / shortGcd) * (shortGcd - 30 % shortGcd)) {
                 result = 6 * Math.ceil(30 / shortGcd) * shortGcd;
@@ -232,17 +232,17 @@
         }
 
         function pps(gcd, sps, r2, suc, adlo, ED, rezz) {
-            var cycle = getCycle(gcd, sps);
+            let cycle = getCycle(gcd, sps);
             return getP(gcd, r2, sps, ED, suc + adlo + rezz, cycle) / cycle;
         }
 
         function mpps(gcd, sps, suc, adlo, ED, rezz) {
-            var cycle = getCycle(gcd, sps);
+            let cycle = getCycle(gcd, sps);
             return getMP(gcd, sps, suc, adlo, ED, rezz, cycle) / cycle;
         }
 
         function MPTime(pie, gcd, sps, suc, adlo, ED, rezz) {
-            var result = CalcPiety(pie) / 3 - mpps(gcd, sps, suc, adlo, ED, rezz);
+            let result = CalcPiety(pie) / 3 - mpps(gcd, sps, suc, adlo, ED, rezz);
             return Math.floor(-10000 / result);
         }
 
@@ -252,19 +252,19 @@
 
         // DPS AND HPS RELATED CALCULATIONS
         function Damage(Potency, WD, JobMod, MainStat, Det, Crit, DH, hasBrd, hasDrg, hasSch, hasDnc, classNum) {
-            var myStat = Math.floor(MainStat * (1 + 0.01 * classNum));
-            var myDmg = Math.floor(Potency * (WD + Math.floor(baseMain * JobMod / 1000)) * (100 + Math.floor((myStat - baseMain) * 195 / baseMain)) / 100);
+            let myStat = Math.floor(MainStat * (1 + 0.01 * classNum));
+            let myDmg = Math.floor(Potency * (WD + Math.floor(baseMain * JobMod / 1000)) * (100 + Math.floor((myStat - baseMain) * 195 / baseMain)) / 100);
             myDmg = Math.floor(myDmg * CalcDetDamage(Det));
             myDmg = Math.floor(myDmg * magicAndMend);
-            var CritDamage = CalcCritDamage(Crit);
-            var CritRate = CalcCritRate(Crit) + (hasDrg ? battleLitanyAvg : 0) + (hasSch ? chainStratAvg : 0) + (hasDnc ? devilmentAvg : 0) + (hasBrd ? brdCritAvg : 0);
-            var DHRate = CalcDHRate(DH) + (hasBrd ? battleVoiceAvg + brdDhAvg : 0) + (hasDnc ? devilmentAvg : 0);
+            let CritDamage = CalcCritDamage(Crit);
+            let CritRate = CalcCritRate(Crit) + (hasDrg ? battleLitanyAvg : 0) + (hasSch ? chainStratAvg : 0) + (hasDnc ? devilmentAvg : 0) + (hasBrd ? brdCritAvg : 0);
+            let DHRate = CalcDHRate(DH) + (hasBrd ? battleVoiceAvg + brdDhAvg : 0) + (hasDnc ? devilmentAvg : 0);
             return myDmg * (1 + (DHRate / 4)) * (1 + (CritRate * CritDamage)) / 100;
         }
 
         function Healing(Potency, WD, JobMod, MainStat, Det, classNum) {
-            var myStat = Math.floor(MainStat * (1 + 0.01 * classNum));
-            var myDmg = Math.floor(Potency * (WD + Math.floor(baseMain * JobMod / 1000)) * (100 + Math.floor((myStat - baseMain) * 569 / 1522)) / 100);
+            let myStat = Math.floor(MainStat * (1 + 0.01 * classNum));
+            let myDmg = Math.floor(Potency * (WD + Math.floor(baseMain * JobMod / 1000)) * (100 + Math.floor((myStat - baseMain) * 569 / 1522)) / 100);
             myDmg = Math.floor(myDmg * CalcDetDamage(Det));
             myDmg = Math.floor(myDmg * magicAndMend);
             return myDmg / 100;
@@ -305,7 +305,7 @@
         }
 
         async function getJson(setID) {
-            var response = await fetch(`https://etro.gg/api/gearsets/${gearset}/`)
+            let response = await fetch(`https://etro.gg/api/gearsets/${gearset}/`)
             return await response.json();
         }
 
@@ -319,13 +319,13 @@
         }
 
         function getID(ID) {
-            var temp = document.querySelector('#' + ID).valueAsNumber;
+            let temp = document.querySelector('#' + ID).valueAsNumber;
             return (temp > 0 && temp < 9999) ? temp : 0;
         }
 
         function getDPS() {
             if (sps) {
-                gcd = Math.floor(0.250 * (1000 - Math.floor(130 * (sps - 400) / 1900))) / 100;
+                gcd = Math.floor(0.250 * (1000 - Math.floor(130 * (sps - baseSub) / levelMod))) / 100;
                 ppsx = pps(gcd, sps, ruin2rate, succorrate, adlorate, energydrainrate, resrate);
                 writeID('gcd', gcd.toFixed(2) + 's');
             } else {
@@ -395,7 +395,7 @@
             refdet = getID('refdet');
             refsps = getID('refsps');
             if (refdmg && refmnd && refpie && refdh && refcrt && refdet && refsps) {
-                refgcd = Math.floor(0.250 * (1000 - Math.floor(130 * (refsps - 400) / 1900))) / 100;
+                refgcd = Math.floor(0.250 * (1000 - Math.floor(130 * (refsps - baseSub) / levelMod))) / 100;
                 refpps = pps(refgcd, refsps, ruin2rate, succorrate, adlorate, energydrainrate, resrate);
                 refdps = Damage(refpps, refdmg, 115, refmnd, refdet, refcrt, refdh, false, false, true, false, 5);
                 refhps = Healing(100, refdmg, 115, refmnd, refdet, 5);
@@ -484,8 +484,8 @@
         })
 
         document.querySelector('#importref').addEventListener('click', async (event) => {
-            var myUrl = document.querySelector('#etrolink').value.substr(0, 100);
-            var result = await get_set_from_etro(myUrl);
+            let myUrl = document.querySelector('#etrolink').value.substr(0, 100);
+            let result = await get_set_from_etro(myUrl);
             if (result) {
                 writeID('importstatus', 'Last import: GOOD!');
                 writeRef(result);
@@ -495,8 +495,8 @@
         })
 
         document.querySelector('#importstat').addEventListener('click', async (event) => {
-            var myUrl = document.querySelector('#etrolink').value.substr(0, 100);
-            var result = await get_set_from_etro(myUrl);
+            let myUrl = document.querySelector('#etrolink').value.substr(0, 100);
+            let result = await get_set_from_etro(myUrl);
             if (result) {
                 writeID('importstatus', 'Last import: GOOD!');
                 writeStats(result);
