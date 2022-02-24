@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>SMN QuickCalc</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <!-- CSS Reset -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+    <!-- Milligram CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
+</head>
+
+<body>
+    <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+    <p></p>
+    <div class="container">
+        <div class="row">
+            <h1>SMN Stat Calculator ver 6.08</h1>
+        </div>
+        <div class="row">
+            <div class="column">
+                <h3>Functions</h3>
+                <h4>Reference Stats</h4>
+                <button class="button" id="setsvg">Use Savage Gearset</button>
+                <button class="button" id="settome">Use Tome Gearset</button>
+                <p></p>
+                <h4>Import Data</h4>
+                <form onkeypress="etrosubmit(event)">
+                    <fieldset>
+                        <label for="etrolink">Etro URL</label>
+                        <input type="text" name="etrolink" id="etrolink" placeholder="https://etro.gg/gearset/...">
+                    </fieldset>
+                </form>
+                <button class="button" id="importstat">Import to Your Stats</button>
+                <button class="button" id="importref">Import to Reference</button>
+                <p id="importstatus"></p>
+            </div>
+            <div class="column">
+                <h3>Reference Stats</h3>
+                <form>
+                    <fieldset>
+                        <label for="refdmg">DMG</label>
+                        <input type="number" name="refdmg" id="refdmg" placeholder="DMG" min="1" max="9999">
+                        <label for="refint">INT</label>
+                        <input type="number" name="refint" id="refint" placeholder="INT" min="1" max="9999">
+                        <label for="refdh">DH</label>
+                        <input type="number" name="refdh" id="refdh" placeholder="DH" min="1" max="9999">
+                        <label for="refcrt">CRT</label>
+                        <input type="number" name="refcrt" id="refcrt" placeholder="CRT" min="1" max="9999">
+                        <label for="refdet">DET</label>
+                        <input type="number" name="refdet" id="refdet" placeholder="DET" min="1" max="9999">
+                        <label for="refsps">SPS</label>
+                        <input type="number" name="refsps" id="refsps" placeholder="SPS" min="1" max="9999">
+                    </fieldset>
+                </form>
+                <button class="button" id="calcref">Calculate Reference Stats</button>
+            </div>
+            <div class="column">
+                <h3>Your Stats</h3>
+                <form>
+                    <fieldset>
+                        <label for="dmg">DMG</label>
+                        <input type="number" name="dmg" id="dmg" placeholder="DMG" min="1" max="9999">
+                        <label for="int">INT</label>
+                        <input type="number" name="int" id="int" placeholder="INT" min="1" max="9999">
+                        <label for="dh">DH</label>
+                        <input type="number" name="dh" id="dh" placeholder="DH" min="1" max="9999">
+                        <label for="crt">CRT</label>
+                        <input type="number" name="crt" id="crt" placeholder="CRT" min="1" max="9999">
+                        <label for="det">DET</label>
+                        <input type="number" name="det" id="det" placeholder="DET" min="1" max="9999">
+                        <label for="sps">SPS</label>
+                        <input type="number" name="sps" id="sps" placeholder="SPS" min="1" max="9999">
+                    </fieldset>
+                </form>
+                <button class="button button-outline" id="calcstat">Force Re-Calculate</button>
+            </div>
+            <div class="column">
+                <h3>Results</h3>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th>GCD</th>
+                            <td id="gcd">GCD</td>
+                        </tr>
+                        <tr>
+                            <th>Crit Rate</th>
+                            <td id="crate">Crit Rate</td>
+                        </tr>
+                        <tr>
+                            <th>Crit DMG</th>
+                            <td id="cdmg">Crit DMG</td>
+                        </tr>
+                        <tr>
+                            <th>DH Rate</th>
+                            <td id="dhrate">DH Rate</td>
+                        </tr>
+                        <tr>
+                            <th>Det DMG</th>
+                            <td id="detdmg">Det DMG</td>
+                        </tr>
+                        <tr>
+                            <th>Avg DPS (30s)</th>
+                            <td id="avgdps30">Avg DPS</td>
+                        </tr>
+                        <tr>
+                            <th>Avg DPS (60s)</th>
+                            <td id="avgdps60">Avg DPS</td>
+                        </tr>
+                        <tr>
+                            <th>Avg DPS (90s)</th>
+                            <td id="avgdps90">Avg DPS</td>
+                        </tr>
+                        <tr>
+                            <th>Avg DPS (120s)</th>
+                            <td id="avgdps120">Avg DPS</td>
+                        </tr>
+                        <tr>
+                            <th>DPS Gain (120s)</th>
+                            <td id="reldps">DPS Gain</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        // INITIALIZE VARS
+        var dmg = 0, int = 0, dh = 0, crt = 0, det = 0, sps = 0;
+        var gcd = 0, crate = 0, cdmg = 0, dhrate = 0, detdmg = 0, mpmin = 0, mpup = 0, avgdps = 0, ppsx = 0, reldps = 0, relhps = 0;
+        var refdmg = 0, refint = 0, refdh = 0, refdet = 0, refsps = 0, refdps = 0, refgcd = 0, refpps = 0;
+        var refgcd = 0, refcrate = 0, refcdmg = 0, refdhrate = 0, refdetdmg = 0;
+        const setSavage = [120, 2572, 980, 1504, 1267, 1075], setTome = [119, 2564, 1061, 1271, 1407, 1082];
+        const maxPot = 189;
+
+        // SMN SPELL POTENCIES
+        const SPELLS = [{ name: "Potion", cast: 0, recast: 1.25, ability: true, duration: 30, cooldown: 270, weaveable: true },
+        { name: "Swiftcast", cast: 0, recast: 0.75, ability: true, duration: 10, cooldown: 60, weaveable: true },
+        { name: "Searing Light", cast: 0, recast: 0.75, ability: true, duration: 30, cooldown: 120, weaveable: true },
+        { name: "Ruin III", cast: 1.5, recast: 2.5, potency: 310 },
+        { name: "Ruin IV", cast: 0, recast: 2.5, potency: 430 },
+        { name: "Energy Drain", cast: 0, recast: 0.75, potency: 200, ability: true, cooldown: 60, weaveable: true },
+        { name: "Fester", cast: 0, recast: 0.75, potency: 300, ability: true, cooldown: 3, weaveable: true },
+        { name: "Summon Bahamut", cast: 0, recast: 2.5, duration: 15, cooldown: 60 },
+        { name: "Astral Impulse", cast: 0, recast: 2.5, potency: 440, petpot: 150 },
+        { name: "Enkindle Bahamut", cast: 0, recast: 0, petpot: 1300, ability: true, cooldown: 20, weaveable: true },
+        { name: "Deathflare", cast: 0, recast: 0, potency: 500, ability: true, cooldown: 20, weaveable: true },
+        { name: "Summon Garuda II", cast: 0, recast: 2.5, petpot: 700, duration: 30 },
+        { name: "Emerald Rite", cast: 0, recast: 1.5, potency: 230 },
+        { name: "Slipstream", cast: 3, recast: 3.5, potency: 430, dotpotency: 30, duration: 15, swiftable: true },
+        { name: "Summon Ifrit II", cast: 0, recast: 2.5, petpot: 700, duration: 30 },
+        { name: "Ruby Rite", cast: 2.8, recast: 2.5, potency: 450, swiftable: true },
+        { name: "Crimson Cyclone", cast: 0, recast: 2.5, potency: 430 },
+        { name: "Crimson Strike", cast: 0, recast: 2.5, potency: 430 },
+        { name: "Summon Titan II", cast: 0, recast: 2.5, petpot: 700, duration: 30 },
+        { name: "Topaz Rite", cast: 0, recast: 2.5, potency: 330 },
+        { name: "Mountain Buster", cast: 0, recast: 0.75, potency: 150, weaveable: true },
+        { name: "Summon Phoenix", cast: 0, recast: 2.5, duration: 15, cooldown: 60 },
+        { name: "Fountain of Fire", cast: 0, recast: 2.5, potency: 540, petpot: 150 },
+        { name: "Enkindle Phoenix", cast: 0, recast: 0, petpot: 1300, ability: true, cooldown: 20, weaveable: true }];
+
+        const POT = 0, SWIFT = 1, SEARING = 2, R3 = 3, R4 = 4, ED = 5, FESTER = 6, BAHAMUT = 7, IMPULSE = 8, EB = 9, DF = 10, GARUDA = 11, EMRITE = 12, SLIPS = 13, IFRIT = 14, RUBYRITE = 15, CC = 16, CS = 17, TITAN = 18, TOPRITE = 19, MB = 20, PHOENIX = 21, FOF = 22, EP = 23;
+        const ROTATO = [R3, SEARING, R3, BAHAMUT, POT, IMPULSE, IMPULSE, ED, IMPULSE, EB, FESTER, IMPULSE, DF, FESTER, IMPULSE, IMPULSE, GARUDA, EMRITE, SLIPS, R4, EMRITE, EMRITE, EMRITE, IFRIT, SWIFT, RUBYRITE, RUBYRITE, CC, CS, TITAN, TOPRITE, MB, TOPRITE, MB, TOPRITE, MB, TOPRITE, MB, R3, PHOENIX, FOF, ED, FOF, EP, FESTER, FOF, FESTER, FOF, FOF, FOF, GARUDA, SLIPS, EMRITE, EMRITE, EMRITE, EMRITE, IFRIT, SWIFT, RUBYRITE, RUBYRITE, CC, CS, TITAN, TOPRITE, MB, TOPRITE, MB, TOPRITE, MB, TOPRITE, MB, R3, R4, R3, R3, R3, R3, R3, R3, R3, R3];
+        const PRECAST = 2;
+
+        // JOBMOD ETC
+        const magicAndMend = 1.3;
+        const levelMod = 1900;
+        const baseMain = 390;
+        const baseSub = 400;
+
+        function CalcCritRate(Crit) {
+            return Math.floor(200 * (Crit - baseSub) / levelMod + 50) / 1000;
+        }
+
+        function CalcCritDamage(Crit) {
+            return Math.floor(200 * (Crit - baseSub) / levelMod + 1400) / 1000;
+        }
+
+        function CalcDHRate(DH) {
+            return Math.floor(550 * (DH - baseSub) / levelMod) / 1000;
+        }
+
+        function CalcDetDamage(Det) {
+            return (1000 + Math.floor(140 * (Det - baseMain) / levelMod)) / 1000;
+        }
+
+        function calcEDMG(CRATE, CDMG, DHRATE) {
+            let myNormal = 1 - CRATE - DHRATE + (CRATE * DHRATE);
+            let myCrit = CDMG * (CRATE - DHRATE * CRATE);
+            let myDH = 1.25 * (DHRATE - DHRATE * CRATE);
+            let myCDH = 1.25 * DHRATE * CDMG * CRATE;
+            return myNormal + myCrit + myDH + myCDH;
+        }
+
+        function calcCast(SPS, time) {
+            return Math.floor((1 - (SPS - baseSub) * 0.130 / levelMod) * time * 100) / 100;
+        }
+
+        function calcPot(INT) {
+            return (INT < (maxPot * 10)) ? ((INT + Math.floor(INT / 10)) / INT) : ((INT + maxPot) / INT);
+        }
+
+        function roundThree(NUM) {
+            return Math.round(NUM * 1000) / 1000;
+        }
+
+        function roundTwo(NUM) {
+            return Math.round(NUM * 100) / 100;
+        }
+
+        function calcRotato(WD, INT, DH, CRT, DET, SPS, BONUS) {
+            let spell, swift = false, result = [], potency = 0, petpotency = 0, dmg = 0, time = 0, tick = 0, lastTime = 0, myTime = 0, dmgsum = 0, searTime = 0, potTime = 0, slipTime = 0, mySlip = 0, summonTime = 0, summonCD = 0;
+            let myINT = Math.floor(INT * (1 + 0.01 * BONUS));
+            let myMAP = roundThree(MAP(WD, myINT));
+            let myDetDmg = CalcDetDamage(DET), myCrate = CalcCritRate(CRT), myCdmg = CalcCritDamage(CRT), myDHrate = CalcDHRate(DH);
+            let petScale = roundThree(petMAP(WD, INT) / myMAP);
+            let potScale = roundThree(calcPot(myINT));
+            let dotScale = Math.floor((130 * (SPS - baseSub)) / levelMod) / 1000 + 1
+            let buffScale = 1, ticked = false, lastPotSpell = false, lastSlipDot = false;
+            let edmg = roundThree(calcEDMG(myCrate, myCdmg, myDHrate));
+            ROTATO.every((element, index) => {
+                lastTime = time;
+                spell = SPELLS[element];
+                if (element == POT) potTime = spell.duration;
+                if (element == SEARING) searTime = spell.duration;
+                if (element == SLIPS) {
+                    slipTime = Math.floor((spell.duration - 0.2 * calcCast(SPS, spell.cast)) * 100) / 100;
+                    mySlip = roundTwo(spell.dotpotency * dotScale * buffScale);
+                }
+                if (element == BAHAMUT || element == PHOENIX) {
+                    while (summonCD > 1.5) {
+                        myTime = calcCast(SPS, SPELLS[R3].cast);
+                        time += myTime;
+                        summonCD -= myTime;
+                        dmgsum += Math.floor(SPELLS[R3].potency * myMAP * magicAndMend * myDetDmg * edmg);
+                        if (lastTime < 15 && time >= 15) result.push({ name: "15s", value: roundThree(dmgsum / time), truedmg: dmgsum, truetime: time });
+                        if (lastTime < 30 && time >= 30) result.push({ name: "30s", value: roundThree(dmgsum / time), truedmg: dmgsum, truetime: time });
+                        if (lastTime < 60 && time >= 60) result.push({ name: "60s", value: roundThree(dmgsum / time), truedmg: dmgsum, truetime: time });
+                        if (lastTime < 90 && time >= 90) result.push({ name: "90s", value: roundThree(dmgsum / time), truedmg: dmgsum, truetime: time });
+                        if (lastTime < 120 && time >= 120) result.push({ name: "120s", value: roundThree(dmgsum / time), truedmg: dmgsum, truetime: time });
+                        lastTime = time;
+                    }
+                    summonTime = spell.duration;
+                    summonCD = spell.cooldown;
+                }
+                if (index >= PRECAST && !spell.weaveable) {
+                    myTime = (element == EMRITE) ? spell.recast : Math.max(calcCast(SPS, spell.cast), calcCast(SPS, spell.recast));
+                    if (swift) {
+                        myTime = calcCast(SPS, spell.recast);
+                        swift = false;
+                    }
+                    time = roundTwo(time + myTime);
+                    searTime = roundTwo(searTime - myTime);
+                    if (searTime < 0) searTime = 0;
+                    if (potTime && (potTime < myTime)) lastPotSpell = true;
+                    potTime = roundTwo(potTime - myTime);
+                    if (potTime < 0) potTime = 0;
+                    if (slipTime && (slipTime < myTime)) lastSlipDot = true;
+                    slipTime = roundTwo(slipTime - ((element == SLIPS) ? 0 : myTime));
+                    if (slipTime < 0) slipTime = 0;
+                    summonTime = roundTwo(summonTime - myTime);
+                    if (summonTime < 0) summonTime = 0;
+                    summonCD = roundTwo(summonCD - myTime);
+                    if (summonCD < 0) summonCD = 0;
+                    tick = Math.ceil(lastTime / 3) * 3;
+                }
+                buffScale = Math.floor((((searTime > 0) ? 1.03 : 1) * (((potTime > 0) || lastPotSpell) ? potScale : 1)) * 100) / 100;
+                if (lastPotSpell) lastPotSpell = false;
+                potency = (spell.potency) ? roundThree(spell.potency * buffScale) : 0;
+                petpotency = (spell.petpot) ? roundThree(spell.petpot * buffScale * petScale) : 0;
+                if ((element == IMPULSE || element == FOF) && summonTime < 1.5) petpotency = 0;
+                ticked = (lastTime < tick) && (time >= tick);
+                dmg = Math.floor((potency + petpotency + (ticked && (slipTime > 0 || lastSlipDot) ? mySlip : 0)) * myMAP * magicAndMend * myDetDmg * edmg);
+                if (lastSlipDot) lastSlipDot = false;
+                dmgsum += dmg;
+                if (element == SWIFT) swift = true;
+                if (lastTime < 15 && time >= 15) result.push({ name: "15s", value: roundThree(dmgsum / time), truedmg: dmgsum, truetime: time });
+                if (lastTime < 30 && time >= 30) result.push({ name: "30s", value: roundThree(dmgsum / time), truedmg: dmgsum, truetime: time });
+                if (lastTime < 60 && time >= 60) result.push({ name: "60s", value: roundThree(dmgsum / time), truedmg: dmgsum, truetime: time });
+                if (lastTime < 90 && time >= 90) result.push({ name: "90s", value: roundThree(dmgsum / time), truedmg: dmgsum, truetime: time });
+                if (lastTime < 120 && time >= 120) result.push({ name: "120s", value: roundThree(dmgsum / time), truedmg: dmgsum, truetime: time });
+                if (time > 120) return false;
+                return true;
+            });
+            return result;
+        }
+
+        // DPS AND HPS RELATED CALCULATIONS
+        function MAP(WD, INT) {
+            return (WD + Math.floor(baseMain * 0.115)) * (100 + Math.floor((INT - baseMain) * 195 / baseMain)) / 10000;
+        }
+
+        function petMAP(WD, INT) {
+            return (WD + Math.floor(baseMain * 0.1)) * (100 + Math.floor((INT - baseMain - 58) * 195 / baseMain)) / 10000;
+        }
+
+        // ETRO GETTER
+        async function get_set_from_etro(url) {
+            if (url === "") {
+                return false;
+            }
+
+            let regex = RegExp("https:\/\/etro\.gg\/gearset\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})")
+            let exec = regex.exec(url);
+            if (exec === null) {
+                // TODO handle case where gearset has an invalid URL
+                return false;
+            }
+            gearset = exec[1];
+
+            let response;
+            try {
+                response = await getJson(gearset);
+            } catch (e) {
+                // 404, couldn't get the set
+                return false;
+            }
+
+            response = response.totalParams;
+
+            return [
+                response.find((elem) => elem.name == "Weapon Damage").value,
+                response.find((elem) => elem.name == "INT").value,
+                response.find((elem) => elem.name == "DH").value,
+                response.find((elem) => elem.name == "CRT").value,
+                response.find((elem) => elem.name == "DET").value,
+                response.find((elem) => elem.name == "SPS").value
+            ];
+        }
+
+        async function getJson(setID) {
+            let response = await fetch(`https://etro.gg/api/gearsets/${gearset}/`)
+            return await response.json();
+        }
+
+        // PAGE FUNCTIONS
+        function writeID(ID, toWrite) {
+            document.querySelector('#' + ID).textContent = String(toWrite);
+        }
+
+        function writeIDval(ID, toWrite) {
+            document.querySelector('#' + ID).value = Number(toWrite);
+        }
+
+        function getID(ID) {
+            let temp = document.querySelector('#' + ID).valueAsNumber;
+            return (temp > 0 && temp < 9999) ? temp : 0;
+        }
+
+        function getDPS() {
+            if (sps) {
+                gcd = calcCast(sps, 2.5);
+                writeID('gcd', gcd.toFixed(2) + 's');
+            } else {
+                writeID('gcd', '- . - - s');
+            }
+            if (dh) {
+                dhrate = CalcDHRate(dh);
+                writeID('dhrate', (dhrate * 100).toFixed(1) + '%');
+            } else {
+                writeID('dhrate', '- - - . - %')
+            }
+            if (crt) {
+                crate = CalcCritRate(crt);
+                cdmg = CalcCritDamage(crt);
+                writeID('crate', (crate * 100).toFixed(1) + '%');
+                writeID('cdmg', (cdmg * 100).toFixed(1) + '%');
+            } else {
+                writeID('crate', '- - . - %');
+                writeID('cdmg', '- - - . - %');
+            }
+            if (det) {
+                detdmg = CalcDetDamage(det);
+                writeID('detdmg', (detdmg * 100).toFixed(1) + '%');
+            } else {
+                writeID('detdmg', '- - - . - %');
+            }
+            if (dmg && int && dh && crt && det && sps) {
+                avgdps = calcRotato(dmg, int, dh, crt, det, sps, 0);
+                writeID('avgdps30', avgdps[1].value.toFixed(1) + 'dps');
+                writeID('avgdps60', avgdps[2].value.toFixed(1) + 'dps');
+                writeID('avgdps90', avgdps[3].value.toFixed(1) + 'dps');
+                writeID('avgdps120', avgdps[4].value.toFixed(1) + 'dps');
+            } else {
+                avgdps = 0;
+                writeID('avgdps30', '- - - - . - dps');
+                writeID('avgdps60', '- - - - . - dps');
+                writeID('avgdps90', '- - - - . - dps');
+                writeID('avgdps120', '- - - - . - dps');
+            }
+            printRel();
+        }
+
+        function printRel() {
+            if (avgdps && refdps) {
+                reldps = avgdps[4].value / refdps - 1;
+                writeID('reldps', (reldps * 100).toFixed(2) + '%');
+            } else {
+                writeID('reldps', '- - . - %');
+            }
+        }
+
+        function getRefs() {
+            refdmg = getID('refdmg');
+            refint = getID('refint');
+            refdh = getID('refdh');
+            refcrt = getID('refcrt');
+            refdet = getID('refdet');
+            refsps = getID('refsps');
+            if (refdmg && refint && refdh && refcrt && refdet && refsps) {
+                refgcd = calcCast(refsps, 2.5);
+                refdps = calcRotato(refdmg, refint, refdh, refcrt, refdet, refsps, 0)[4].value;
+            } else {
+                refdps = 0;
+            }
+            printRel();
+        }
+
+        function writeRef(statArr) {
+            writeIDval('refdmg', statArr[0]);
+            writeIDval('refint', statArr[1]);
+            writeIDval('refdh', statArr[2]);
+            writeIDval('refcrt', statArr[3]);
+            writeIDval('refdet', statArr[4]);
+            writeIDval('refsps', statArr[5]);
+            [refdmg, refint, refdh, refcrt, refdet, refsps] = statArr;
+            getRefs();
+        }
+
+        function writeStats(statArr) {
+            writeIDval('dmg', statArr[0]);
+            writeIDval('int', statArr[1]);
+            writeIDval('dh', statArr[2]);
+            writeIDval('crt', statArr[3]);
+            writeIDval('det', statArr[4]);
+            writeIDval('sps', statArr[5]);
+            [dmg, int, dh, crt, det, sps] = statArr;
+            getDPS();
+        }
+
+        // EVENT HANDLERS
+        document.onload = writeRef(setSavage);
+
+        function etrosubmit(event) {
+            if (event.key.includes('Enter')) {
+                event.preventDefault();
+                document.querySelector('#importstat').dispatchEvent(new Event('click'));
+            }
+        }
+
+        document.querySelector('#dmg').addEventListener('change', (event) => {
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                dmg = event.target.valueAsNumber;
+                getDPS();
+            }
+        })
+        document.querySelector('#int').addEventListener('change', (event) => {
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                int = event.target.valueAsNumber;
+                getDPS();
+            }
+        })
+        document.querySelector('#dh').addEventListener('change', (event) => {
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                dh = event.target.valueAsNumber;
+                getDPS();
+            }
+        })
+        document.querySelector('#crt').addEventListener('change', (event) => {
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                crt = event.target.valueAsNumber;
+                getDPS();
+            }
+        })
+        document.querySelector('#det').addEventListener('change', (event) => {
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                det = event.target.valueAsNumber;
+                getDPS();
+            }
+        })
+        document.querySelector('#sps').addEventListener('change', (event) => {
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                sps = event.target.valueAsNumber;
+                getDPS();
+            }
+        })
+
+        document.querySelector('#calcref').addEventListener('click', (event) => {
+            getRefs();
+        })
+
+        document.querySelector('#calcstat').addEventListener('click', (event) => {
+            getDPS();
+        })
+
+        document.querySelector('#setsvg').addEventListener('click', (event) => {
+            writeRef(setSavage);
+        })
+
+        document.querySelector('#settome').addEventListener('click', (event) => {
+            writeRef(setTome);
+        })
+
+        document.querySelector('#importref').addEventListener('click', async (event) => {
+            let myUrl = document.querySelector('#etrolink').value.substr(0, 100);
+            let result = await get_set_from_etro(myUrl);
+            if (result) {
+                writeID('importstatus', 'Last import: GOOD!');
+                writeRef(result);
+            } else {
+                writeID('importstatus', 'Last import: Failed!');
+            }
+        })
+
+        document.querySelector('#importstat').addEventListener('click', async (event) => {
+            let myUrl = document.querySelector('#etrolink').value.substr(0, 100);
+            let result = await get_set_from_etro(myUrl);
+            if (result) {
+                writeID('importstatus', 'Last import: GOOD!');
+                writeStats(result);
+            } else {
+                writeID('importstatus', 'Last import: Failed!');
+            }
+        })
+    </script>
+</body>
+
+</html>
