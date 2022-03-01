@@ -257,21 +257,21 @@
 
         // DPS AND HPS RELATED CALCULATIONS
         function NewDamage(Potency, WD, JobMod, MainStat, Det, Crit, DH, tinctureCap, dmgBonus, critRateBonus, dhRateBonus) {
-            const tinctureGain = Math.min(tinctureCap, 0.1 * MainStat)
-            const tincturePercentage = -1 + (100 + Math.floor((tinctureGain + MainStat - baseMain) * M / baseMain)) / (100 + Math.floor((MainStat - baseMain) * M / baseMain))
-            const tinctureAvg = 1 + ((30 / 270) * tincturePercentage)
+            let tinctureGain = Math.min(tinctureCap, 0.1 * MainStat)
+            let tincturePercentage = -1 + (100 + Math.floor((tinctureGain + MainStat - baseMain) * M / baseMain)) / (100 + Math.floor((MainStat - baseMain) * M / baseMain))
+            let tinctureAvg = 1 + ((30 / 270) * tincturePercentage)
             let Damage = Math.floor(Potency * (WD + Math.floor(baseMain * JobMod / 1000)) * (100 + Math.floor((MainStat - baseMain) * M / baseMain)) / 100);
             Damage = Math.floor(Damage * (1000 + Math.floor(140 * (Det - baseMain) / levelMod)) / 1000);
             Damage = Math.floor(Damage / 100);
             dmgBonus.forEach(element => { Damage = Math.floor(Damage * element); });
             Damage = Math.floor(Damage * tinctureAvg);
-            const CritDamage = Math.floor(Damage * CalcCritDamage(Crit));
-            const DHDamage = Math.floor(Damage * 1.25);
-            const CritDHDamage = Math.floor(CritDamage * 1.25);
-            const CritRate = CalcCritRate(Crit) + critRateBonus;
-            const DHRate = CalcDHRate(DH) + dhRateBonus;
-            const CritDHRate = CritRate * DHRate;
-            const NormalRate = 1 - CritRate - DHRate + CritDHRate;
+            let CritDamage = Math.floor(Damage * CalcCritDamage(Crit));
+            let DHDamage = Math.floor(Damage * 1.25);
+            let CritDHDamage = Math.floor(CritDamage * 1.25);
+            let CritRate = CalcCritRate(Crit) + critRateBonus;
+            let DHRate = CalcDHRate(DH) + dhRateBonus;
+            let CritDHRate = CritRate * DHRate;
+            let NormalRate = 1 - CritRate - DHRate + CritDHRate;
             return Damage * NormalRate + CritDamage * (CritRate - CritDHRate) + DHDamage * (DHRate - CritDHRate) + CritDHDamage * CritDHRate;
         }
 
@@ -330,8 +330,7 @@
 
         function getDPS() {
             if (sps) {
-                gcd = Math.floor(0.250 * (1000 - Math.floor(130 * (sps - 400) / 1900))) / 100;
-                ppsx = pps(sps, gcd, c3rate, m2rate, resrate, lilyrate);
+                gcd = Math.floor(0.250 * (1000 - Math.floor(130 * (sps - baseSub) / levelMod))) / 100;
                 writeID('gcd', gcd.toFixed(2) + 's');
             } else {
                 writeID('gcd', '- . - - s');
@@ -357,8 +356,8 @@
             } else {
                 writeID('detdmg', '- - - . - %');
             }
-            if (dmg && int && dh && crt && det && ppsx) {
-                avgdps = Damage(ppsx, dmg, 115, mnd, det, crt, dh, true, true, true, false, 5);
+            if (dmg && int && dh && crt && det) {
+                avgdps = NewDamage(PhysicalPps(), dmg, 115, int, det, crt, dh, 189, [1.3], 0, 0) + NewDamage(MagicPps(gcd), dmg, 115, int, det, crt, dh, 189, [1.3], 0, 0);
                 writeID('avgdps', avgdps.toFixed(1) + 'dps');
             } else {
                 avgdps = 0;
