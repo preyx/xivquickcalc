@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>MCH QuickCalc</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <!-- CSS Reset -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+    <!-- Milligram CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
+</head>
+
+<body>
+    <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+    <p></p>
+    <div class="container">
+        <div class="row">
+            <h1>MCH Stat Calculator ver 6.08</h1>
+        </div>
+        <div class="row">
+            <div class="column">
+                <h3>Functions</h3>
+                <h4>Reference Stats</h4>
+                <button class="button" id="setsvg">Use Savage Gearset</button>
+                <button class="button" id="settome">Use Tome Gearset</button>
+                <p></p>
+                <h4>Import Data</h4>
+                <form onkeypress="etrosubmit(event)">
+                    <fieldset>
+                        <label for="etrolink">Etro URL</label>
+                        <input type="text" name="etrolink" id="etrolink" placeholder="https://etro.gg/gearset/...">
+                    </fieldset>
+                </form>
+                <button class="button" id="importstat">Import to Your Stats</button>
+                <button class="button" id="importref">Import to Reference</button>
+                <p id="importstatus"></p>
+            </div>
+            <div class="column">
+                <h3>Reference Stats</h3>
+                <form>
+                    <fieldset>
+                        <label for="refdmg">DMG</label>
+                        <input type="number" name="refdmg" id="refdmg" placeholder="DMG" min="1" max="9999">
+                        <label for="refdex">DEX</label>
+                        <input type="number" name="refdex" id="refdex" placeholder="DEX" min="1" max="9999">
+                        <label for="refdh">DH</label>
+                        <input type="number" name="refdh" id="refdh" placeholder="DH" min="1" max="9999">
+                        <label for="refcrt">CRT</label>
+                        <input type="number" name="refcrt" id="refcrt" placeholder="CRT" min="1" max="9999">
+                        <label for="refdet">DET</label>
+                        <input type="number" name="refdet" id="refdet" placeholder="DET" min="1" max="9999">
+                        <label for="refsks">SKS</label>
+                        <input type="number" name="refsks" id="refsks" placeholder="SKS" min="1" max="9999">
+                    </fieldset>
+                </form>
+                <button class="button" id="calcref">Calculate Reference Stats</button>
+            </div>
+            <div class="column">
+                <h3>Your Stats</h3>
+                <form>
+                    <fieldset>
+                        <label for="dmg">DMG</label>
+                        <input type="number" name="dmg" id="dmg" placeholder="DMG" min="1" max="9999">
+                        <label for="dex">DEX</label>
+                        <input type="number" name="dex" id="dex" placeholder="DEX" min="1" max="9999">
+                        <label for="dh">DH</label>
+                        <input type="number" name="dh" id="dh" placeholder="DH" min="1" max="9999">
+                        <label for="crt">CRT</label>
+                        <input type="number" name="crt" id="crt" placeholder="CRT" min="1" max="9999">
+                        <label for="det">DET</label>
+                        <input type="number" name="det" id="det" placeholder="DET" min="1" max="9999">
+                        <label for="sks">SKS</label>
+                        <input type="number" name="sks" id="sks" placeholder="SKS" min="1" max="9999">
+                    </fieldset>
+                </form>
+                <button class="button button-outline" id="calcstat">Force Re-Calculate</button>
+            </div>
+            <div class="column">
+                <h3>Results</h3>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th>GCD</th>
+                            <td id="gcd">GCD</td>
+                        </tr>
+                        <tr>
+                            <th>Crit Rate</th>
+                            <td id="crate">Crit Rate</td>
+                        </tr>
+                        <tr>
+                            <th>Crit DMG</th>
+                            <td id="cdmg">Crit DMG</td>
+                        </tr>
+                        <tr>
+                            <th>DH Rate</th>
+                            <td id="dhrate">DH Rate</td>
+                        </tr>
+                        <tr>
+                            <th>Det DMG</th>
+                            <td id="detdmg">Det DMG</td>
+                        </tr>
+                        <tr>
+                            <th>Avg DPS</th>
+                            <td id="avgdps">Avg DPS</td>
+                        </tr>
+                        <tr>
+                            <th>DPS Gain</th>
+                            <td id="reldps">DPS Gain</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        // INITIALIZE VARS
+        var dmg = 0, dex = 0, dh = 0, crt = 0, det = 0, sks = 0;
+        var gcd = 0, crate = 0, cdmg = 0, dhrate = 0, detdmg = 0, avgdps = 0, reldps = 0;
+        var refdmg = 0, refdex = 0, refdh = 0, refcrt = 0, refdet = 0, refsks = 0, refdps = 0, refgcd = 0;
+        const setSavage = [120, 2572, 1417, 1582, 1225, 602], setTome = [119, 2564, 1318, 1433, 1468, 602];
+        const autoGCD = 2.64;
+
+        const REA = 0, DR = 1, GR = 2, RICO = 3, AIR = 4, BS = 5, CS = 6, WF = 7, HC = 8, HB = 9, AQ = 10, C = 11;
+        const SKILLS = [
+            { name: "Reassemble", gcd: 0, potency: 0 },
+            { name: "Drill", gcd: 2.5, potency: 570 },
+            { name: "Gauss Round", gcd: 0, potency: 120 },
+            { name: "Ricochet", gcd: 0, potency: 120 },
+            { name: "Air Anchor", gcd: 2.5, potency: 570 },
+            { name: "Barrel Stabilizer", gcd: 0, potency: 0 },
+            { name: "Chain Saw", gcd: 2.5, potency: 0 },
+            { name: "Wildfire", gcd: 0, potency: 0, duration: 10 },
+            { name: "Hypercharge", gcd: 0, potency: 0, duration: 8 },
+            { name: "Heat Blast", gcd: 1.5, potency: 170 },
+            { name: "Automaton Queen", gcd: 0, potency: 0, duration: 20 },
+            { name: "Heated Split Shot", gcd: 2.5, potency: 200 },
+            { name: "Heated Slug Shot", gcd: 2.5, potency: 280 },
+            { name: "Heated Clean Shot", gcd: 2.5, potency: 360 }
+        ];
+        const Q_PUNCH = 120, Q_DELAY = 5, Q_MULT = 1.5, Q_OVER = 1400, Q_DASH = 240;
+
+        const ROTATO250 = 0, ROTATO244 = 1, ROTATO238 = 2;
+        const ROTATO = [
+            [REA, DR, GR, RICO, AIR, BS, GR, CS, WF, HC, HB, RICO, HB, GR, HB, RICO, HB, GR, HB, RICO, C, GR, RICO, C, REA, DR, GR, RICO, C, C, C, C, C, C, C, DR, AIR, C, C, AQ, C, C, C, C, DR, C, CS, GR, RICO, C, HC, HB, GR, HB, RICO, HB, GR, HB, RICO, HB, GR, C, RICO, REA, DR, AIR, C, C, HC, HB, HB, GR, HB, RICO, HB, GR, HB, RICO, C, DR, C, C, C, C, C, C, AQ, C, GR, RICO, DR, GR, RICO, AIR, BS, CS, WF, HC, HB, GR, HB, RICO, HB, GR, HB, RICO, HB, C, GR, RICO, C, REA, DR, HC, HB, HB, GR, HB, RICO, HB, GR, HB, RICO, C, C, C, C, DR, AIR, C, AQ, C, C, C, C, C, DR, GR, RICO, C, GR, RICO, CS, C, HC, HB, GR, HB, RICO, HB, GR, HB, RICO, HB, GR, C, RICO, REA, DR, AIR, C, C, C, C, C, C, DR, C, HC, HB, GR, HB, RICO, HB, GR, HB, RICO, HB, C, AQ, C, GR, RICO, C, GR, RICO, DR, AIR, BS, CS, WF, HC, HB, GR, HB, RICO, HB, GR, HB, RICO, HB, GR, C, RICO, C, REA, DR, C, C, C, C, C, C, C, DR, AIR, AQ, C, C, C, C, C, C, DR, GR, RICO, C, GR, RICO, CS, C, HC, HB, HB, GR, HB, RICO, HB, GR, HB, RICO, C, REA, DR, GR, RICO, AIR, C, C, C, C, C, C, DR, HC, HB, GR, HB, RICO, HB, GR, HB, RICO, HB, C, C, AQ, C, GR, RICO, C],
+            [REA, DR, GR, RICO, AIR, BS, GR, CS, WF, HC, HB, RICO, HB, GR, HB, RICO, HB, GR, HB, RICO, C, GR, RICO, C, REA, DR, GR, RICO, C, C, C, C, C, C, C, DR, AIR, C, C, AQ, C, C, C, C, DR, C, CS, GR, RICO, C, HC, HB, GR, HB, RICO, HB, GR, HB, RICO, HB, GR, C, RICO, REA, DR, AIR, C, C, HC, HB, HB, GR, HB, RICO, HB, GR, HB, RICO, C, DR, C, C, C, C, C, C, AQ, C, GR, RICO, DR, GR, RICO, AIR, CS, BS, C, WF, HC, HB, GR, HB, RICO, HB, GR, HB, RICO, HB, GR, C, RICO, REA, DR, HC, HB, HB, GR, HB, RICO, HB, GR, HB, RICO, C, C, C, C, DR, AIR, C, AQ, C, C, C, C, C, DR, GR, RICO, C, GR, RICO, CS, C, HC, HB, GR, HB, RICO, HB, GR, HB, RICO, HB, GR, C, RICO, REA, DR, AIR, C, C, C, C, C, C, DR, C, HC, HB, GR, HB, RICO, HB, GR, HB, RICO, HB, C, AQ, C, GR, RICO, C, GR, RICO, DR, AIR, CS, C, BS, C, WF, HC, HB, GR, HB, RICO, HB, GR, HB, RICO, HB, REA, DR, GR, RICO, C, C, C, C, C, C, C, DR, AIR, AQ, C, C, C, C, C, C, DR, C, GR, RICO, CS, C, HC, HB, GR, HB, RICO, HB, GR, HB, RICO, HB, GR, C, RICO, REA, DR, GR, RICO, AIR, C, C, C, C, C, C, DR, HC, HB, GR, HB, RICO, HB, GR, HB, RICO, HB, C, C, AQ, C, GR, RICO, C],
+            [REA, DR, GR, RICO, AIR, BS, GR, CS, WF, HC, HB, RICO, HB, GR, HB, RICO, HB, GR, HB, RICO, C, GR, RICO, C, REA, DR, GR, RICO, C, C, C, C, C, C, C, DR, AIR, C, C, AQ, C, C, C, C, DR, C, CS, GR, RICO, C, HC, HB, GR, HB, RICO, HB, GR, HB, RICO, HB, GR, C, RICO, REA, DR, AIR, C, C, HC, HB, HB, GR, HB, RICO, HB, GR, HB, RICO, C, DR, C, C, C, C, C, C, AQ, C, GR, RICO, DR, GR, RICO, AIR, CS, C, BS, C, WF, HC, HB, GR, HB, RICO, HB, GR, HB, RICO, HB, REA, DR, GR, HC, HB, RICO, HB, GR, HB, RICO, HB, GR, HB, RICO, C, C, C, C, DR, AIR, C, AQ, C, C, C, C, C, DR, GR, RICO, C, GR, RICO, CS, C, HC, HB, GR, HB, RICO, HB, GR, HB, RICO, HB, GR, C, RICO, REA, DR, AIR, C, C, C, C, C, C, DR, C, HC, HB, GR, HB, RICO, HB, GR, HB, RICO, HB, C, AQ, C, GR, RICO, C, GR, RICO, DR, AIR, CS, C, C, C, BS, C, C, REA, WF, DR, HC, HB, GR, HB, RICO, HB, GR, HB, RICO, HB, GR, C, RICO, C, C, C, DR, AIR, AQ, C, C, C, C, C, C, DR, C, CS, GR, RICO, C, HC, HB, GR, HB, RICO, HB, GR, HB, RICO, HB, C, REA, DR, GR, RICO, AIR, C, C, C, C, C, C, GR, RICO, DR, HC, HB, HB, GR, HB, RICO, HB, GR, HB, RICO, C, C, AQ, C, GR, RICO, C]
+        ];
+
+        // PARTY BUFF VALUES
+        const battleVoiceAvg = 0.025;
+        const battleLitanyAvg = 0.0125;
+        const chainStratAvg = 0.0125;
+        const devilmentAvg = 0.033333;
+        const brdCritAvg = 0.0075;
+        const brdDhAvg = 0.01125;
+
+        // TRAITS
+        const magicAndMend = 1.3;
+
+        // JOBMOD ETC
+        const levelMod = 1900;
+        const baseMain = 390;
+        const baseSub = 400;
+        const jobMod = 115;
+        const APdiv = 195;
+
+        function CalcCritRate(Crit) {
+            return (Math.floor(200 * (Crit - baseSub) / levelMod) + 50) / 1000;
+        }
+
+        function CalcCritDamage(Crit) {
+            return (Math.floor(200 * (Crit - baseSub) / levelMod) + baseSub) / 1000;
+        }
+
+        function CalcDHRate(DH) {
+            return Math.floor(550 * (DH - baseSub) / levelMod) / 1000;
+        }
+
+        function CalcDetDamage(Det) {
+            return roundThree(1 + 140 * (Det - baseMain) / levelMod / 1000);
+        }
+
+        function CalcGCD(Sks) {
+            return Math.floor(0.250 * (1000 - Math.floor(130 * (Sks - baseSub) / levelMod))) / 100;
+        }
+
+        function roundTwo(NUM) {
+            return Math.round(NUM * 100) / 100;
+        }
+
+        function roundThree(NUM) {
+            return Math.round(NUM * 1000) / 1000;
+        }
+
+        // DPS AND HPS RELATED CALCULATIONS
+        function calcRotato(WD, DEX, DH, CRT, DET, SKS, BONUS, PRECAST) {
+            let time = 0, lastTime = 0, myTime = 0, delay = 2.64, reaBuff = false, wfTime = 0, hcTime = 0, shotOffset = 0, dmgSum = 0, batt = 0, queenPot = 0, queenDmg = 0;
+            let myGCD = CalcGCD(SKS);
+            let rot = (myGCD < 2.44 ? (myGCD < 2.38 ? ROTATO238 : ROTATO244) : ROTATO250);
+            let myDEX = Math.floor(DEX * (1 + 0.01 * BONUS));
+            let wdMod = WD + Math.floor(baseMain * 115 / 1000);
+            let detMod = CalcDetDamage(DET);
+            let crate = CalcCritRate(CRT);
+            let cdmg = CalcCritDamage(CRT);
+            let dhrate = CalcDHRate(DH);
+            let critMod = 1 + crate * cdmg;
+            let dhMod = 1 + dhrate * 0.25;
+            let apMod = roundThree(1 + APdiv * (DEX - baseMain) / baseMain / 100);
+            let sksMod = roundThree(1 / (1 - Math.floor(130 * (SKS - baseSub) / levelMod) / 1000));
+            let queenWD = WD + Math.floor(baseMain / 10);
+            let queenAPMod = roundThree(1 + APdiv * (DEX - baseMain * 1.15) / baseMain / 100);
+            let queenMod = roundThree((queenWD * queenAPMod) / (wdMod * apMod));
+            let autoPotency = Math.floor(360 / delay) * 80 / 3 * delay;
+            let autoDmg = Math.floor(Math.floor(autoPotency / 100 * wdMod * apMod * detMod * sksMod) * critMod * dhMod);
+            ROTATO[rot].every((element, index) => {
+                if (element == REA) {
+                    reaBuff = true;
+                    return true;
+                }
+                lastTime = time;
+                if (element == C) {
+                    element += shotOffset++;
+                    if (shotOffset == 3) shotOffset = 0;
+                }
+                if (element == C + 2) batt += 1;
+                if (element == AIR || element == CS) batt += 2;
+                if (element == AQ) {
+                    pilePot = Q_OVER * batt / 10;
+                    queenPot = Q_PUNCH * batt + pilePot;
+                    queenDmg = Math.floor(Math.floor(queenPot / 100 * queenWD * queenAPMod * detMod * 1.2) * critMod * dhMod);
+                    batt = 0;
+                    dmgSum += queenDmg;
+                    return true;
+                }
+                skill = SKILLS[element];
+                if (element == WF) wfTime = skill.duration;
+                if (element == HC) hcTime = skill.duration;
+                dmg = Math.floor(Math.floor((skill.potency + (hcTime > 0.75 && skill.gcd ? 20 : 0)) / 100 * wdMod * apMod * detMod * 1.2) * (reaBuff && skill.gcd ? (1 + cdmg) * 1.25 : critMod * dhMod));
+                if (wfTime && skill.gcd) dmg += Math.floor(150 / 100 * wdMod * apMod * detMod * sksMod * 1.2);
+                dmgSum += dmg;
+                if (reaBuff && skill.gcd) reaBuff = false;
+                if (index >= PRECAST && skill.gcd) {
+                    myTime = skill.gcd == 2.5 ? myGCD : skill.gcd;
+                    time = roundTwo(time + myTime);
+                    wfTime -= myTime;
+                    if (wfTime < 0) wfTime = 0;
+                    hcTime -= myTime;
+                    if (hcTime < 0) hcTime = 0;
+                }
+                return true;
+            });
+            return roundTwo((dmgSum + autoDmg) / time);
+        }
+
+        // ETRO GETTER
+        async function get_set_from_etro(url) {
+            if (url === "") {
+                return false;
+            }
+
+            let regex = RegExp("https:\/\/etro\.gg\/gearset\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})")
+            let exec = regex.exec(url);
+            if (exec === null) {
+                // TODO handle case where gearset has an invalid URL
+                return false;
+            }
+            gearset = exec[1];
+
+            let response;
+            try {
+                response = await getJson(gearset);
+            } catch (e) {
+                // 404, couldn't get the set
+                return false;
+            }
+
+            response = response.totalParams;
+
+            return [
+                response.find((elem) => elem.name == "Weapon Damage").value,
+                response.find((elem) => elem.name == "DEX").value,
+                response.find((elem) => elem.name == "DH").value,
+                response.find((elem) => elem.name == "CRT").value,
+                response.find((elem) => elem.name == "DET").value,
+                response.find((elem) => elem.name == "SKS").value
+            ];
+        }
+
+        async function getJson(setID) {
+            let response = await fetch(`https://etro.gg/api/gearsets/${gearset}/`)
+            return await response.json();
+        }
+
+        // PAGE FUNCTIONS
+        function writeID(ID, toWrite) {
+            document.querySelector('#' + ID).textContent = String(toWrite);
+        }
+
+        function writeIDval(ID, toWrite) {
+            document.querySelector('#' + ID).value = Number(toWrite);
+        }
+
+        function getID(ID) {
+            let temp = document.querySelector('#' + ID).valueAsNumber;
+            return (temp > 0 && temp < 9999) ? temp : 0;
+        }
+
+        function getDPS() {
+            if (sks) {
+                gcd = CalcGCD(sks);
+                writeID('gcd', gcd.toFixed(2) + 's');
+            } else {
+                writeID('gcd', '- . - - s');
+            }
+            if (dh) {
+                dhrate = CalcDHRate(dh);
+                writeID('dhrate', (dhrate * 100).toFixed(1) + '%');
+            } else {
+                writeID('dhrate', '- - - . - %')
+            }
+            if (crt) {
+                crate = CalcCritRate(crt);
+                cdmg = CalcCritDamage(crt);
+                writeID('crate', (crate * 100).toFixed(1) + '%');
+                writeID('cdmg', (cdmg * 100 + 100).toFixed(1) + '%');
+            } else {
+                writeID('crate', '- - . - %');
+                writeID('cdmg', '- - - . - %');
+            }
+            if (det) {
+                detdmg = CalcDetDamage(det);
+                writeID('detdmg', (detdmg * 100).toFixed(1) + '%');
+            } else {
+                writeID('detdmg', '- - - . - %');
+            }
+            if (dmg && dex && dh && crt && det && sks) {
+                avgdps = calcRotato(dmg, dex, dh, crt, det, sks, 0, 2);
+                writeID('avgdps', avgdps.toFixed(1) + 'dps');
+            } else {
+                avgdps = 0;
+                writeID('avgdps', '- - - - . - dps');
+            }
+            printRel();
+        }
+
+        function printRel() {
+            if (avgdps && refdps) {
+                reldps = avgdps / refdps - 1;
+                writeID('reldps', (reldps * 100).toFixed(2) + '%');
+            } else {
+                writeID('reldps', '- - . - %');
+            }
+        }
+
+        function getRefs() {
+            refdmg = getID('refdmg');
+            refmnd = getID('refdex');
+            refdh = getID('refdh');
+            refcrt = getID('refcrt');
+            refdet = getID('refdet');
+            refsps = getID('refsks');
+            if (refdmg && refdex && refdh && refcrt && refdet && refsks) {
+                refgcd = CalcGCD(refsks);
+                refdps = calcRotato(refdmg, refdex, refdh, refcrt, refdet, refsks, 0, 2);
+            } else {
+                refdps = 0;
+            }
+            printRel();
+        }
+
+        function writeRef(statArr) {
+            writeIDval('refdmg', statArr[0]);
+            writeIDval('refdex', statArr[1]);
+            writeIDval('refdh', statArr[2]);
+            writeIDval('refcrt', statArr[3]);
+            writeIDval('refdet', statArr[4]);
+            writeIDval('refsks', statArr[5]);
+            [refdmg, refdex, refdh, refcrt, refdet, refsks] = statArr;
+            getRefs();
+        }
+
+        function writeStats(statArr) {
+            writeIDval('dmg', statArr[0]);
+            writeIDval('dex', statArr[1]);
+            writeIDval('dh', statArr[2]);
+            writeIDval('crt', statArr[3]);
+            writeIDval('det', statArr[4]);
+            writeIDval('sks', statArr[5]);
+            [dmg, dex, dh, crt, det, sks] = statArr;
+            getDPS();
+        }
+
+        // EVENT HANDLERS
+        document.onload = writeRef(setSavage);
+
+        function etrosubmit(event) {
+            if (event.key.includes('Enter')) {
+                event.preventDefault();
+                document.querySelector('#importstat').dispatchEvent(new Event('click'));
+            }
+        }
+
+        document.querySelector('#dmg').addEventListener('change', (event) => {
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                dmg = event.target.valueAsNumber;
+                getDPS();
+            }
+        })
+        document.querySelector('#dex').addEventListener('change', (event) => {
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                dex = event.target.valueAsNumber;
+                getDPS();
+            }
+        })
+        document.querySelector('#dh').addEventListener('change', (event) => {
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                dh = event.target.valueAsNumber;
+                getDPS();
+            }
+        })
+        document.querySelector('#crt').addEventListener('change', (event) => {
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                crt = event.target.valueAsNumber;
+                getDPS();
+            }
+        })
+        document.querySelector('#det').addEventListener('change', (event) => {
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                det = event.target.valueAsNumber;
+                getDPS();
+            }
+        })
+        document.querySelector('#sks').addEventListener('change', (event) => {
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                sks = event.target.valueAsNumber;
+                getDPS();
+            }
+        })
+
+        document.querySelector('#calcref').addEventListener('click', (event) => {
+            getRefs();
+        })
+
+        document.querySelector('#calcstat').addEventListener('click', (event) => {
+            getDPS();
+        })
+
+        document.querySelector('#setsvg').addEventListener('click', (event) => {
+            writeRef(setSavage);
+        })
+
+        document.querySelector('#settome').addEventListener('click', (event) => {
+            writeRef(setTome);
+        })
+
+        document.querySelector('#importref').addEventListener('click', async (event) => {
+            let myUrl = document.querySelector('#etrolink').value.substr(0, 100);
+            let result = await get_set_from_etro(myUrl);
+            if (result) {
+                writeID('importstatus', 'Last import: GOOD!');
+                writeRef(result);
+            } else {
+                writeID('importstatus', 'Last import: Failed!');
+            }
+        })
+
+        document.querySelector('#importstat').addEventListener('click', async (event) => {
+            let myUrl = document.querySelector('#etrolink').value.substr(0, 100);
+            let result = await get_set_from_etro(myUrl);
+            if (result) {
+                writeID('importstatus', 'Last import: GOOD!');
+                writeStats(result);
+            } else {
+                writeID('importstatus', 'Last import: Failed!');
+            }
+        })
+    </script>
+</body>
+
+</html>
