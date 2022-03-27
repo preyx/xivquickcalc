@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>DNC QuickCalc</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <!-- CSS Reset -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+    <!-- Milligram CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
+</head>
+
+<body>
+    <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+    <p></p>
+    <div class="container">
+        <div class="row">
+            <h1>DNC Stat Calculator ver 6.08</h1>
+        </div>
+        <div class="row">
+            <div class="column">
+                <h3>Functions</h3>
+                <h4>Reference Stats</h4>
+                <button class="button" id="setsvg">Use Savage Gearset</button>
+                <button class="button" id="settome">Use Tome Gearset</button>
+                <p></p>
+                <h4>Import Data</h4>
+                <form onkeypress="etrosubmit(event)">
+                    <fieldset>
+                        <label for="etrolink">Etro URL</label>
+                        <input type="text" name="etrolink" id="etrolink" placeholder="https://etro.gg/gearset/...">
+                    </fieldset>
+                </form>
+                <button class="button" id="importstat">Import to Your Stats</button>
+                <button class="button" id="importref">Import to Reference</button>
+                <p id="importstatus"></p>
+            </div>
+            <div class="column">
+                <h3>Reference Stats</h3>
+                <form>
+                    <fieldset>
+                        <label for="refdmg">DMG</label>
+                        <input type="number" name="refdmg" id="refdmg" placeholder="DMG" min="1" max="9999">
+                        <label for="refdex">DEX</label>
+                        <input type="number" name="refdex" id="refdex" placeholder="DEX" min="1" max="9999">
+                        <label for="refdh">DH</label>
+                        <input type="number" name="refdh" id="refdh" placeholder="DH" min="1" max="9999">
+                        <label for="refcrt">CRT</label>
+                        <input type="number" name="refcrt" id="refcrt" placeholder="CRT" min="1" max="9999">
+                        <label for="refdet">DET</label>
+                        <input type="number" name="refdet" id="refdet" placeholder="DET" min="1" max="9999">
+                        <label for="refsks">SKS</label>
+                        <input type="number" name="refsks" id="refsks" placeholder="SKS" min="1" max="9999">
+                    </fieldset>
+                </form>
+                <button class="button" id="calcref">Calculate Reference Stats</button>
+            </div>
+            <div class="column">
+                <h3>Your Stats</h3>
+                <form>
+                    <fieldset>
+                        <label for="dmg">DMG</label>
+                        <input type="number" name="dmg" id="dmg" placeholder="DMG" min="1" max="9999">
+                        <label for="dex">DEX</label>
+                        <input type="number" name="dex" id="dex" placeholder="DEX" min="1" max="9999">
+                        <label for="dh">DH</label>
+                        <input type="number" name="dh" id="dh" placeholder="DH" min="1" max="9999">
+                        <label for="crt">CRT</label>
+                        <input type="number" name="crt" id="crt" placeholder="CRT" min="1" max="9999">
+                        <label for="det">DET</label>
+                        <input type="number" name="det" id="det" placeholder="DET" min="1" max="9999">
+                        <label for="sks">SKS</label>
+                        <input type="number" name="sks" id="sks" placeholder="SKS" min="1" max="9999">
+                    </fieldset>
+                </form>
+                <button class="button button-outline" id="calcstat">Force Re-Calculate</button>
+            </div>
+            <div class="column">
+                <h3>Results</h3>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th>GCD</th>
+                            <td id="gcd">GCD</td>
+                        </tr>
+                        <tr>
+                            <th>Crit Rate</th>
+                            <td id="crate">Crit Rate</td>
+                        </tr>
+                        <tr>
+                            <th>Crit DMG</th>
+                            <td id="cdmg">Crit DMG</td>
+                        </tr>
+                        <tr>
+                            <th>DH Rate</th>
+                            <td id="dhrate">DH Rate</td>
+                        </tr>
+                        <tr>
+                            <th>Det DMG</th>
+                            <td id="detdmg">Det DMG</td>
+                        </tr>
+                        <tr>
+                            <th>Avg DPS</th>
+                            <td id="avgdps">Avg DPS</td>
+                        </tr>
+                        <tr>
+                            <th>DPS Gain</th>
+                            <td id="reldps">DPS Gain</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        // INITIALIZE VARS
+        var dmg = 0, dex = 0, dh = 0, crt = 0, det = 0, sks = 0;
+        var gcd = 0, crate = 0, cdmg = 0, dhrate = 0, detdmg = 0, avgdps = 0, reldps = 0;
+        var refdmg = 0, refdex = 0, refdh = 0, refcrt = 0, refdet = 0, refsks = 0, refdps = 0, refgcd = 0;
+        const setSavage = [120, 2572, 1417, 1582, 1225, 602], setTome = [119, 2564, 1318, 1433, 1468, 602];
+        const espritGen = 2000 / 8.5;
+
+        const CASC = 0, FOUN = 1, REVC = 2, FOFA = 3, SABD = 4, STAD = 5, STDF = 6, TECF = 7, TILL = 8, FD1 = 9, FD3 = 10, FD4 = 11, AUTO = 12,
+            QTY = [
+                [0, 0.7048, 0.5286, 1.1008, 1.6512, 5.7793],
+                [0, 0.7048, 0.5286, 1.1008, 1.6512, 5.7793],
+                [0, 0.9238, 0.6929, 0.6794, 1.0192, 3.5671],
+                [0, 0.9238, 0.6929, 0.6794, 1.0192, 3.5671],
+                [0, 0.7429, 0.5571, 0.4395, 0.6592, 2.3072],
+                [0, 1, 0, 0, 0, 0],
+                [0, 0, 0, 0, 1, 2],
+                [1, 0, 0, 0, 0, 0],
+                [0, 1, 0, 0, 0, 0],
+                [0, 3.4625, 1.1542, 0.2923, 0.2923, 1.6810],
+                [0, 2.7313, 0.5771, 0.2752, 1.2752, 0.5824],
+                [0, 1, 0, 0, 1, 0],
+                [0, 4.8077, 1.6026, 3.2051, 4.8077, 0]
+            ],
+            POTENCY = [220, 280, 280, 340, 480, 600, 720, 1200, 360, 150, 200, 300, 93.6];
+
+        // JOBMOD ETC
+        const levelMod = 1900;
+        const baseMain = 390;
+        const baseSub = 400;
+        const jobMod = 115;
+        const APdiv = 195;
+
+        function CalcCritRate(Crit) {
+            return (Math.floor(200 * (Crit - baseSub) / levelMod) + 50) / 1000;
+        }
+
+        function CalcCritDamage(Crit) {
+            return (Math.floor(200 * (Crit - baseSub) / levelMod) + baseSub) / 1000;
+        }
+
+        function CalcDHRate(DH) {
+            return Math.floor(550 * (DH - baseSub) / levelMod) / 1000;
+        }
+
+        function CalcDetDamage(Det) {
+            return roundThree(1 + 140 * (Det - baseMain) / levelMod / 1000);
+        }
+
+        function CalcGCD(Sks) {
+            return Math.floor(0.250 * (1000 - Math.floor(130 * (Sks - baseSub) / levelMod))) / 100;
+        }
+
+        function roundTwo(NUM) {
+            return Math.round(NUM * 100) / 100;
+        }
+
+        function roundThree(NUM) {
+            return Math.round(NUM * 1000) / 1000;
+        }
+
+        // DPS AND HPS RELATED CALCULATIONS
+        function calcDmg(WD, DEX, DH, CRT, DET, SKS, BONUS) {
+            let dmgSum = 0;
+            let myGCD = CalcGCD(SKS);
+            let myDEX = Math.floor(DEX * (1 + 0.01 * BONUS));
+            let wdMod = WD + Math.floor(baseMain * 115 / 1000);
+            let detMod = CalcDetDamage(DET);
+            let crate = CalcCritRate(CRT);
+            let cdmg = CalcCritDamage(CRT);
+            let dhrate = CalcDHRate(DH);
+            let critMod = 1 + crate * cdmg;
+            let critModPlus = 1 + (crate + 0.2) * cdmg;
+            let dhMod = 1 + dhrate * 0.25;
+            let dhModPlus = 1 + (dhrate + 0.2) * 0.25;
+            let apMod = roundThree(1 + APdiv * (myDEX * 1.01 - baseMain) / baseMain / 100);
+            let sksMod = roundThree(1 / (1 - Math.floor(130 * (SKS - baseSub) / levelMod) / 1000));
+
+            let time = roundThree(39 * myGCD + 8.5 + 15 + 39 * 0.008 + 9 * 0.008 + 10 * 0.008);
+            if (time < 120) time = 120;
+
+            QTY.forEach((element, index) => {
+                
+                dmgSum += element[0] * POTENCY[index] * apMod * detMod * wdMod * (index == STAD ? (1 + cdmg) * 1.25 : critMod * dhMod) * (index == AUTO ? sksMod * 0.0105 : 0.0126);
+                dmgSum += element[1] * POTENCY[index] * apMod * detMod * wdMod * (index == STAD ? (1 + cdmg) * 1.25 : critModPlus * dhModPlus) * (index == AUTO ? sksMod * 0.011025 : 0.01323);
+                dmgSum += element[2] * POTENCY[index] * apMod * detMod * wdMod * (index == STAD ? (1 + cdmg) * 1.25 : critModPlus * dhModPlus) * (index == AUTO ? sksMod * 0.011025 : 0.01323);
+                dmgSum += element[3] * POTENCY[index] * apMod * detMod * wdMod * (index == STAD ? (1 + cdmg) * 1.25 : critMod * dhMod) * (index == AUTO ? sksMod * 0.0105 : 0.0126);
+                dmgSum += element[4] * POTENCY[index] * apMod * detMod * wdMod * (index == STAD ? (1 + cdmg) * 1.25 : critMod * dhMod) * (index == AUTO ? sksMod * 0.0105 : 0.0126);
+                dmgSum += element[5] * POTENCY[index] * apMod * detMod * wdMod * (index == STAD ? (1 + cdmg) * 1.25 : critMod * dhMod) * (index == AUTO ? sksMod * 0.0105 : 0.0126);
+            });
+            dmgSum += (time / 3.12 - 14.424) * POTENCY[AUTO] * apMod * detMod * wdMod * critMod * dhMod * sksMod * 0.0105;
+            dmgSum *= 0.9991; // Rounding adjustment
+            return roundTwo(dmgSum / time);
+        }
+
+        // ETRO GETTER
+        async function get_set_from_etro(url) {
+            if (url === "") {
+                return false;
+            }
+
+            let regex = RegExp("https:\/\/etro\.gg\/gearset\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})")
+            let exec = regex.exec(url);
+            if (exec === null) {
+                // TODO handle case where gearset has an invalid URL
+                return false;
+            }
+            gearset = exec[1];
+
+            let response;
+            try {
+                response = await getJson(gearset);
+            } catch (e) {
+                // 404, couldn't get the set
+                return false;
+            }
+
+            response = response.totalParams;
+
+            return [
+                response.find((elem) => elem.name == "Weapon Damage").value,
+                response.find((elem) => elem.name == "DEX").value,
+                response.find((elem) => elem.name == "DH").value,
+                response.find((elem) => elem.name == "CRT").value,
+                response.find((elem) => elem.name == "DET").value,
+                response.find((elem) => elem.name == "SKS").value
+            ];
+        }
+
+        async function getJson(setID) {
+            let response = await fetch(`https://etro.gg/api/gearsets/${gearset}/`)
+            return await response.json();
+        }
+
+        // PAGE FUNCTIONS
+        function writeID(ID, toWrite) {
+            document.querySelector('#' + ID).textContent = String(toWrite);
+        }
+
+        function writeIDval(ID, toWrite) {
+            document.querySelector('#' + ID).value = Number(toWrite);
+        }
+
+        function getID(ID) {
+            let temp = document.querySelector('#' + ID).valueAsNumber;
+            return (temp > 0 && temp < 9999) ? temp : 0;
+        }
+
+        function getDPS() {
+            if (sks) {
+                gcd = CalcGCD(sks);
+                writeID('gcd', gcd.toFixed(2) + 's');
+            } else {
+                writeID('gcd', '- . - - s');
+            }
+            if (dh) {
+                dhrate = CalcDHRate(dh);
+                writeID('dhrate', (dhrate * 100).toFixed(1) + '%');
+            } else {
+                writeID('dhrate', '- - - . - %')
+            }
+            if (crt) {
+                crate = CalcCritRate(crt);
+                cdmg = CalcCritDamage(crt);
+                writeID('crate', (crate * 100).toFixed(1) + '%');
+                writeID('cdmg', (cdmg * 100 + 100).toFixed(1) + '%');
+            } else {
+                writeID('crate', '- - . - %');
+                writeID('cdmg', '- - - . - %');
+            }
+            if (det) {
+                detdmg = CalcDetDamage(det);
+                writeID('detdmg', (detdmg * 100).toFixed(1) + '%');
+            } else {
+                writeID('detdmg', '- - - . - %');
+            }
+            if (dmg && dex && dh && crt && det && sks) {
+                avgdps = calcDmg(dmg, dex, dh, crt, det, sks, 0);
+                writeID('avgdps', avgdps.toFixed(1) + 'dps');
+            } else {
+                avgdps = 0;
+                writeID('avgdps', '- - - - . - dps');
+            }
+            printRel();
+        }
+
+        function printRel() {
+            if (avgdps && refdps) {
+                reldps = avgdps / refdps - 1;
+                writeID('reldps', (reldps * 100).toFixed(2) + '%');
+            } else {
+                writeID('reldps', '- - . - %');
+            }
+        }
+
+        function getRefs() {
+            refdmg = getID('refdmg');
+            refmnd = getID('refdex');
+            refdh = getID('refdh');
+            refcrt = getID('refcrt');
+            refdet = getID('refdet');
+            refsps = getID('refsks');
+            if (refdmg && refdex && refdh && refcrt && refdet && refsks) {
+                refgcd = CalcGCD(refsks);
+                refdps = calcDmg(refdmg, refdex, refdh, refcrt, refdet, refsks, 0);
+            } else {
+                refdps = 0;
+            }
+            printRel();
+        }
+
+        function writeRef(statArr) {
+            writeIDval('refdmg', statArr[0]);
+            writeIDval('refdex', statArr[1]);
+            writeIDval('refdh', statArr[2]);
+            writeIDval('refcrt', statArr[3]);
+            writeIDval('refdet', statArr[4]);
+            writeIDval('refsks', statArr[5]);
+            [refdmg, refdex, refdh, refcrt, refdet, refsks] = statArr;
+            getRefs();
+        }
+
+        function writeStats(statArr) {
+            writeIDval('dmg', statArr[0]);
+            writeIDval('dex', statArr[1]);
+            writeIDval('dh', statArr[2]);
+            writeIDval('crt', statArr[3]);
+            writeIDval('det', statArr[4]);
+            writeIDval('sks', statArr[5]);
+            [dmg, dex, dh, crt, det, sks] = statArr;
+            getDPS();
+        }
+
+        // EVENT HANDLERS
+        document.onload = writeRef(setSavage);
+
+        function etrosubmit(event) {
+            if (event.key.includes('Enter')) {
+                event.preventDefault();
+                document.querySelector('#importstat').dispatchEvent(new Event('click'));
+            }
+        }
+
+        document.querySelector('#dmg').addEventListener('change', (event) => {
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                dmg = event.target.valueAsNumber;
+                getDPS();
+            }
+        })
+        document.querySelector('#dex').addEventListener('change', (event) => {
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                dex = event.target.valueAsNumber;
+                getDPS();
+            }
+        })
+        document.querySelector('#dh').addEventListener('change', (event) => {
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                dh = event.target.valueAsNumber;
+                getDPS();
+            }
+        })
+        document.querySelector('#crt').addEventListener('change', (event) => {
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                crt = event.target.valueAsNumber;
+                getDPS();
+            }
+        })
+        document.querySelector('#det').addEventListener('change', (event) => {
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                det = event.target.valueAsNumber;
+                getDPS();
+            }
+        })
+        document.querySelector('#sks').addEventListener('change', (event) => {
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                sks = event.target.valueAsNumber;
+                getDPS();
+            }
+        })
+
+        document.querySelector('#calcref').addEventListener('click', (event) => {
+            getRefs();
+        })
+
+        document.querySelector('#calcstat').addEventListener('click', (event) => {
+            getDPS();
+        })
+
+        document.querySelector('#setsvg').addEventListener('click', (event) => {
+            writeRef(setSavage);
+        })
+
+        document.querySelector('#settome').addEventListener('click', (event) => {
+            writeRef(setTome);
+        })
+
+        document.querySelector('#importref').addEventListener('click', async (event) => {
+            let myUrl = document.querySelector('#etrolink').value.substr(0, 100);
+            let result = await get_set_from_etro(myUrl);
+            if (result) {
+                writeID('importstatus', 'Last import: GOOD!');
+                writeRef(result);
+            } else {
+                writeID('importstatus', 'Last import: Failed!');
+            }
+        })
+
+        document.querySelector('#importstat').addEventListener('click', async (event) => {
+            let myUrl = document.querySelector('#etrolink').value.substr(0, 100);
+            let result = await get_set_from_etro(myUrl);
+            if (result) {
+                writeID('importstatus', 'Last import: GOOD!');
+                writeStats(result);
+            } else {
+                writeID('importstatus', 'Last import: Failed!');
+            }
+        })
+    </script>
+</body>
+
+</html>
