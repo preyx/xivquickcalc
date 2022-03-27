@@ -129,7 +129,6 @@
         var gcd = 0, crate = 0, cdmg = 0, dhrate = 0, detdmg = 0, avgdps = 0, reldps = 0;
         var refdmg = 0, refdex = 0, refdh = 0, refcrt = 0, refdet = 0, refsks = 0, refdps = 0, refgcd = 0;
         const setSavage = [120, 2572, 1417, 1582, 1225, 602], setTome = [119, 2564, 1318, 1433, 1468, 602];
-        const espritGen = 2000 / 8.5;
 
         const CASC = 0, FOUN = 1, REVC = 2, FOFA = 3, SABD = 4, STAD = 5, STDF = 6, TECF = 7, TILL = 8, FD1 = 9, FD3 = 10, FD4 = 11, AUTO = 12,
             QTY = [
@@ -205,7 +204,6 @@
             if (time < 120) time = 120;
 
             QTY.forEach((element, index) => {
-                
                 dmgSum += element[0] * POTENCY[index] * apMod * detMod * wdMod * (index == STAD ? (1 + cdmg) * 1.25 : critMod * dhMod) * (index == AUTO ? sksMod * 0.0105 : 0.0126);
                 dmgSum += element[1] * POTENCY[index] * apMod * detMod * wdMod * (index == STAD ? (1 + cdmg) * 1.25 : critModPlus * dhModPlus) * (index == AUTO ? sksMod * 0.011025 : 0.01323);
                 dmgSum += element[2] * POTENCY[index] * apMod * detMod * wdMod * (index == STAD ? (1 + cdmg) * 1.25 : critModPlus * dhModPlus) * (index == AUTO ? sksMod * 0.011025 : 0.01323);
@@ -215,6 +213,7 @@
             });
             dmgSum += (time / 3.12 - 14.424) * POTENCY[AUTO] * apMod * detMod * wdMod * critMod * dhMod * sksMod * 0.0105;
             dmgSum *= 0.9991; // Rounding adjustment
+
             return roundTwo(dmgSum / time);
         }
 
