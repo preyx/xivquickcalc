@@ -8,7 +8,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>DRG QuickCalc</title>
+    <title>GNB QuickCalc</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Google Fonts -->
@@ -26,7 +26,7 @@
     <p></p>
     <div class="container">
         <div class="row">
-            <h1>DRG Stat Calculator ver 6.08</h1>
+            <h1>GNB Stat Calculator ver 6.08</h1>
         </div>
         <div class="row">
             <div class="column">
@@ -60,6 +60,8 @@
                         <input type="number" name="refcrt" id="refcrt" placeholder="CRT" min="1" max="9999">
                         <label for="refdet">DET</label>
                         <input type="number" name="refdet" id="refdet" placeholder="DET" min="1" max="9999">
+                        <label for="reften">TEN</label>
+                        <input type="number" name="reften" id="reften" placeholder="TEN" min="1" max="9999">
                         <label for="refsks">SKS</label>
                         <input type="number" name="refsks" id="refsks" placeholder="SKS" min="1" max="9999">
                     </fieldset>
@@ -80,6 +82,8 @@
                         <input type="number" name="crt" id="crt" placeholder="CRT" min="1" max="9999">
                         <label for="det">DET</label>
                         <input type="number" name="det" id="det" placeholder="DET" min="1" max="9999">
+                        <label for="ten">TEN</label>
+                        <input type="number" name="ten" id="ten" placeholder="TEN" min="1" max="9999">
                         <label for="sks">SKS</label>
                         <input type="number" name="sks" id="sks" placeholder="SKS" min="1" max="9999">
                     </fieldset>
@@ -111,6 +115,10 @@
                             <td id="detdmg">Det DMG</td>
                         </tr>
                         <tr>
+                            <th>Ten DMG</th>
+                            <td id="tendmg">Ten DMG</td>
+                        </tr>
+                        <tr>
                             <th>Avg DPS</th>
                             <td id="avgdps">Avg DPS</td>
                         </tr>
@@ -125,29 +133,43 @@
     </div>
     <script>
         // INITIALIZE VARS
-        var dmg = 0, str = 0, dh = 0, crt = 0, det = 0, sks = 0;
-        var gcd = 0, crate = 0, cdmg = 0, dhrate = 0, detdmg = 0, avgdps = 0, reldps = 0;
-        var refdmg = 0, refstr = 0, refdh = 0, refcrt = 0, refdet = 0, refsks = 0, refdps = 0, refgcd = 0;
-        const setSavage = [120, 2572, 978, 1689, 1557, 602], setTome = [119, 2564, 1509, 1377, 1295, 640];
+        var dmg = 0, str = 0, dh = 0, crt = 0, det = 0, ten = 0, sks = 0;
+        var gcd = 0, crate = 0, cdmg = 0, dhrate = 0, detdmg = 0, tendmg = 0, avgdps = 0, reldps = 0;
+        var refdmg = 0, refstr = 0, refdh = 0, refcrt = 0, refdet = 0, reften = 0, refsks = 0, refdps = 0, refgcd = 0;
+        const setSavage = [120, 2514, 400, 1342, 1646, 1109, 729], setTome = [119, 2506, 400, 1508, 1626, 996, 691];
 
-        const buffLC = { duration: 20, mod: 1.1 },
-            buffDS = { duration: 20, mod: 1.1 },
-            buffBL = { duration: 15, mod: 0.1 },
-            buffDis = { duration: 30, mod: 1.1 },
-            buffPot = { duration: 30, cd: 270, mod: 189 },
-            RaiT = 280, Dise = 250, ChaS = 300, WheT = 300, FanC = 300, VorT = 280, HeaT = 480, CSdot = 45, WyrT = 420;
-        const Abilities = [{ name: "High Jump", potency: 400, naked: 2, LC: 1, LCDSBL: 1 },
-        { name: "Spineshatter Dive", potency: 250, naked: 0, LC: 1, LCDSBL: 1 },
-        { name: "Dragonfire Dive", potency: 300, naked: 0, LC: 0, LCDSBL: 1 },
-        { name: "Mirage Dive", potency: 200, naked: 2, LC: 1, LCDSBL: 1 },
-        { name: "Geirskogul", potency: 260, naked: 2, LC: 1, LCDSBL: 1 },
-        { name: "Nastrond", potency: 360, naked: 2, LC: 2, LCDSBL: 2 },
-        { name: "Stardiver", potency: 620, naked: 0, LC: 1, LCDSBL: 1 }];
-        const ROTATO = [RaiT, Dise, ChaS, WheT, FanC, RaiT, VorT, HeaT, FanC, WheT];
-        const SURGE = [[HeaT, true], [HeaT, false], [HeaT, true], [400, true], [HeaT, false], [HeaT, true], [HeaT, false], [400, false]];
-        const buffMatrix = [[[4, 3, 1], [4, 3, 1], [4, 3, 1], [4, 3, 1], [4, 3, 1], [4, 3, 1], [4, 3, 1], [4, 3, 1], [4, 3, 1], [4, 3, 1], [6, 6, 0]],
-        [[10, 0, 0], [5, 0, 0], [5, 0, 5], [5, 5, 0], [5, 5, 0], [5, 5, 0], [0, 5, 0], [5, 5, 0], [5, 5, 0], [5, 5, 0], [5, 5, 0],],
-        [[6, 3, 1], [4, 4, 0], [6, 3, 1], [4, 4, 0], [6, 3, 1], [4, 4, 0], [6, 3, 1], [4, 4, 0], [6, 3, 1], [4, 4, 0], [6, 6, 0]]];
+        const LIGHT = 0, KEEN = 1, BRUT = 2, SOLID = 3, BURST = 4, SONIC = 5, GNASH = 6, SAVAG = 7, WICKED = 8, DOUB = 9, SHOCK = 10, DANG = 11, BLAST = 12, DIVI = 13, RIP = 14, TEAR = 15, GOUGE = 16, HYPER = 17;
+        const Skills = [
+            { name: "Lightning Shot", potency: 150 },
+            { name: "Keen Edge", potency: 170 },
+            { name: "Brutal Shell", potency: 260 },
+            { name: "Solid Barrel", potency: 340 },
+            { name: "Burst Strike", potency: 380 },
+            { name: "Sonic Break", potency: 300, dotpotency: 600 },
+            { name: "Gnashing Fang", potency: 360 },
+            { name: "Savage Claw", potency: 440 },
+            { name: "Wicked Talon", potency: 520 },
+            { name: "Double Down", potency: 1200 },
+            { name: "Bow Shock", potency: 150, dotpotency: 300 },
+            { name: "Danger Zone", potency: 250 },
+            { name: "Blasting Zone", potency: 700 },
+            { name: "Rough Divide", potency: 150 },
+            { name: "Jugular Rip", potency: 180 },
+            { name: "Abdomen Tear", potency: 220 },
+            { name: "Eye Gouge", potency: 260 },
+            { name: "Hypervelocity", potency: 180 }
+        ];
+
+        // PARTY BUFF VALUES
+        const battleVoiceAvg = 0.025;
+        const battleLitanyAvg = 0.0125;
+        const chainStratAvg = 0.0125;
+        const devilmentAvg = 0.033333;
+        const brdCritAvg = 0.0075;
+        const brdDhAvg = 0.01125;
+
+        // TRAITS
+        const magicAndMend = 1.3;
 
         // JOBMOD ETC
         const levelMod = 1900;
@@ -171,62 +193,37 @@
             return 1 + Math.floor(140 * (Det - baseMain) / levelMod) / 1000;
         }
 
+        function CalcTenDamage(Ten) {
+            return 1 + Math.floor(100 * (Ten - baseSub) / levelMod) / 1000;
+        }
+
         function CalcGCD(Sks) {
             return Math.floor(0.250 * (1000 - Math.floor(130 * (Sks - baseSub) / levelMod))) / 100;
         }
 
+        function roundTwo(NUM) {
+            return Math.round(NUM * 100) / 100;
+        }
+
         // DPS AND HPS RELATED CALCULATIONS
-        function Damage(WD, JobMod, STR, DET, CRT, DH, SKS, classNum) {
-            let strMod = Math.floor(195 * (STR - baseMain) / baseMain + 100) / 100;
-            let wdMod = (WD + Math.floor(baseMain * JobMod / 1000)) / 100;
+        function Damage(WD, JobMod, STR, DET, CRT, DH, TEN, SKS, classNum) {
+            let strMod = Math.floor(156 * (Math.floor(STR * (1 + 0.01 * classNum)) - baseMain) / baseMain + 100) / 100;
+            let wdMod = WD + Math.floor(baseMain * JobMod / 1000);
             let detMod = CalcDetDamage(DET);
             let crate = CalcCritRate(CRT);
             let cdmg = CalcCritDamage(CRT);
-            let critMod = 1 + crate * cdmg;
+            let critMod = 1 + crate * (crate + 0.35);
             let dhrate = CalcDHRate(DH);
             let dhMod = 1 + dhrate * 0.25;
             let sksMod = 1 + Math.floor(130 * (SKS - baseSub) / levelMod) / 1000;
-            let litStat = 1 + (crate + buffBL.mod) * cdmg;
-            let litMod = litStat / critMod;
-            let potMod = (Math.floor(APdiv * (STR + buffPot.mod - baseMain) / baseMain + 100) / 100 / strMod) * (buffPot.duration / buffPot.cd) + (buffPot.cd - buffPot.duration) / buffPot.cd;
-            let buff1m = buffLC.mod * buffLC.duration / 120 + (120 - buffLC.duration) / 120;
-            let buff2mBL = buffLC.mod * buffDS.mod * litMod * buffBL.duration / 120 + (120 - buffBL.duration) / 120;
-            let buff2mNoBL = buffLC.mod * buffDS.mod * (buffLC.duration - buffBL.duration) / 120 + (120 - buffLC.duration + buffBL.duration) / 120;
-            let autoDPS = (80 / 3) * strMod * wdMod * detMod * critMod * dhMod * sksMod * buff1m * buff2mBL * buff2mNoBL;
+            let tenMod = CalcTenDamage(TEN);
             let gcd = CalcGCD(SKS);
-            let gcdDPS = 0, dmgArray = [];
-            ROTATO.forEach((value, index) => {
-                let dmg = Math.floor(value + (((index + 1) % 5 == 0) ? 100 : 0)) * buffDis.mod * strMod * wdMod * detMod * critMod * dhMod;
-                dmgArray.push(dmg);
-                gcdDPS += dmg;
-            });
-            let dotdmg = CSdot * buffDis.mod * strMod * wdMod * detMod * critMod * dhMod * sksMod * Math.min(24, gcd * 10) / 3;
-            gcdDPS += dotdmg;
-            let wyrtdmg = WyrT * buffDis.mod * strMod * wdMod * detMod * critMod * dhMod;
-            gcdDPS += wyrtdmg;
-            gcdDPS /= gcd * 10;
-            let buffTier = gcd < 2.37 ? 2 : (gcd < 2.47 ? 1 : 0);
-            let buffDPS = 0;
-            dmgArray.forEach((value, index) => {
-                let dmg = (value * buffLC.mod - value) * buffMatrix[buffTier][index][0] + (value * buffLC.mod * buffDS.mod * litMod - value) * buffMatrix[buffTier][index][1] + (value * buffLC.mod * buffDS.mod - value) * buffMatrix[buffTier][index][2];
-                buffDPS += dmg;
-            });
-            let dotBuff = (dotdmg * buffLC.mod - dotdmg) * buffMatrix[buffTier][2][0] + (dotdmg * buffLC.mod * buffDS.mod * litMod - dotdmg) * buffMatrix[buffTier][2][1] + (dotdmg * buffLC.mod * buffDS.mod - dotdmg) * buffMatrix[buffTier][2][2];
-            buffDPS += dotBuff;
-            let wyrtBuff = (wyrtdmg * buffLC.mod - wyrtdmg) * buffMatrix[buffTier][10][0] + (wyrtdmg * buffLC.mod * buffDS.mod * litMod - wyrtdmg) * buffMatrix[buffTier][10][1] + (wyrtdmg * buffLC.mod * buffDS.mod - wyrtdmg) * buffMatrix[buffTier][10][2];
-            buffDPS += wyrtBuff;
-            buffDPS /= 600;
-            let rotatoDPS = 0;
-            Abilities.forEach((value) => { rotatoDPS += value.potency * (value.naked * critMod + value.LC * buffLC.mod * critMod + value.LCDSBL * buffLC.mod * buffDS.mod * litStat) * buffDis.mod * strMod * detMod * dhMod * wdMod; });
-            rotatoDPS /= 120;
-            let lsDPS = 0;
-            SURGE.forEach((value) => {
-                let dmg1 = value[0] * buffDis.mod * buffLC.mod * strMod * detMod * dhMod * wdMod * (value[1] ? litStat * buffDS.mod : critMod);
-                let dmg2 = value[0] * buffDis.mod * buffLC.mod * strMod * detMod * dhMod * wdMod * (1 + cdmg) * (value[1] ? buffDS.mod : 1);
-                lsDPS += dmg2 - dmg1;
-            });
-            lsDPS /= 360;
-            return (autoDPS + gcdDPS + buffDPS + rotatoDPS + lsDPS) * potMod;
+            let time = 300 * (Math.max(gcd, 2.395) + 0.005);
+            let dmg = Skills[KEEN].potency * (48 + 9 * 1.2) + Skills[BRUT].potency * (48 + 9 * 1.2) + Skills[SOLID].potency * (45 + 12 * 1.2) + Skills[BURST].potency * (12 + 21 * 1.2) + Skills[SONIC].potency * (0 + 12 * 1.2) + Skills[GNASH].potency * (14 + 10 * 1.2) + Skills[SAVAG].potency * (12 + 12 * 1.2) + Skills[WICKED].potency * (12 + 12 * 1.2) + Skills[DOUB].potency * (0 + 12 * 1.2);
+            dmg += Skills[SHOCK].potency * 12 * 1.2 + Skills[BLAST].potency * (12 + 12 * 1.2) + Skills[DIVI].potency * 24 * 1.2 + Skills[RIP].potency * (15 + 9 * 1.2) + Skills[TEAR].potency * (12 + 12 * 1.2) + Skills[GOUGE].potency * (12 + 12 * 1.2) + Skills[HYPER].potency * (15 + 18 * 1.2);
+            dmg += (30 * (time + 48) * (2.8 / 2.81) + Skills[SHOCK].dotpotency * 12 * 1.2 + Skills[SONIC].dotpotency * 12 * 1.2) * sksMod;
+            dmg *= wdMod * strMod * critMod * dhMod * detMod * tenMod / 100;
+            return roundTwo(dmg / time);
         }
 
         // ETRO GETTER
@@ -259,6 +256,7 @@
                 response.find((elem) => elem.name == "DH").value,
                 response.find((elem) => elem.name == "CRT").value,
                 response.find((elem) => elem.name == "DET").value,
+                response.find((elem) => elem.name == "TEN").value,
                 response.find((elem) => elem.name == "SKS").value
             ];
         }
@@ -310,8 +308,20 @@
             } else {
                 writeID('detdmg', '- - - . - %');
             }
-            if (dmg && str && dh && crt && det && sks) {
-                avgdps = Damage(dmg, 115, str, det, crt, dh, sks, 5);
+            if (det) {
+                detdmg = CalcDetDamage(det);
+                writeID('detdmg', (detdmg * 100).toFixed(1) + '%');
+            } else {
+                writeID('detdmg', '- - - . - %');
+            }
+            if (ten) {
+                tendmg = CalcTenDamage(ten);
+                writeID('tendmg', (tendmg * 100).toFixed(1) + '%');
+            } else {
+                writeID('tendmg', '- - - . - %');
+            }
+            if (dmg && str && dh && crt && det && ten && sks) {
+                avgdps = Damage(dmg, 100, str, det, crt, dh, ten, sks, 5);
                 writeID('avgdps', avgdps.toFixed(1) + 'dps');
             } else {
                 avgdps = 0;
@@ -336,9 +346,9 @@
             refcrt = getID('refcrt');
             refdet = getID('refdet');
             refsps = getID('refsks');
-            if (refdmg && refstr && refdh && refcrt && refdet && refsks) {
+            if (refdmg && refstr && refdh && refcrt && refdet && reften && refsks) {
                 refgcd = CalcGCD(refsks);
-                refdps = Damage(refdmg, 115, refstr, refdet, refcrt, refdh, refsks, 5);
+                refdps = Damage(refdmg, 100, refstr, refdet, refcrt, refdh, reften, refsks, 5);
             } else {
                 refdps = 0;
             }
@@ -351,8 +361,9 @@
             writeIDval('refdh', statArr[2]);
             writeIDval('refcrt', statArr[3]);
             writeIDval('refdet', statArr[4]);
-            writeIDval('refsks', statArr[5]);
-            [refdmg, refstr, refdh, refcrt, refdet, refsks] = statArr;
+            writeIDval('reften', statArr[5]);
+            writeIDval('refsks', statArr[6]);
+            [refdmg, refstr, refdh, refcrt, refdet, reften, refsks] = statArr;
             getRefs();
         }
 
@@ -362,8 +373,9 @@
             writeIDval('dh', statArr[2]);
             writeIDval('crt', statArr[3]);
             writeIDval('det', statArr[4]);
-            writeIDval('sks', statArr[5]);
-            [dmg, str, dh, crt, det, sks] = statArr;
+            writeIDval('ten', statArr[5]);
+            writeIDval('sks', statArr[6]);
+            [dmg, str, dh, crt, det, ten, sks] = statArr;
             getDPS();
         }
 
@@ -404,6 +416,12 @@
         document.querySelector('#det').addEventListener('change', (event) => {
             if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
                 det = event.target.valueAsNumber;
+                getDPS();
+            }
+        })
+        document.querySelector('#ten').addEventListener('change', (event) => {
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                ten = event.target.valueAsNumber;
                 getDPS();
             }
         })
