@@ -8,7 +8,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>WAR QuickCalc</title>
+    <title>PLD QuickCalc</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Google Fonts -->
@@ -26,7 +26,7 @@
     <p></p>
     <div class="container">
         <div class="row">
-            <h1>WAR Stat Calculator ver 6.05</h1>
+            <h1>PLD Stat Calculator ver 6.05</h1>
         </div>
         <div class="row">
             <div class="column">
@@ -136,20 +136,25 @@
         var dmg = 0, str = 0, dh = 0, crt = 0, det = 0, ten = 0, sks = 0;
         var gcd = 0, crate = 0, cdmg = 0, dhrate = 0, detdmg = 0, tendmg = 0, avgdps = 0, reldps = 0;
         var refdmg = 0, refstr = 0, refdh = 0, refcrt = 0, refdet = 0, reften = 0, refsks = 0, refdps = 0, refgcd = 0;
-        const setSavage = [120, 2533, 400, 1342, 1646, 1109, 729], setTome = [119, 2641, 400, 1508, 1626, 996, 691];
+        const setSavage = [120, 2514, 400, 1342, 1646, 1109, 729], setTome = [119, 2514, 400, 1686, 1633, 929, 578];
 
-        const TOMA = 0, HEAV = 1, MAIM = 2, EYE = 3, PATH = 4, CLEA = 5, CHAO = 6, REND = 7, UPHE = 8, ONSL = 9;
+        const FAST = 0, RIOT = 1, GOR = 2, ROYAL = 3, ATONE = 4, HOLY = 5, CONFI = 6, FAITH = 7, TRUTH = 8, VALOR = 9, SCORN = 10, SPIWI = 11, EXPI = 12, INTER = 13, REQUI = 14;
         const Skills = [
-            { name: "Tomahawk", potency: 150 },
-            { name: "Heavy Swing", potency: 200 },
-            { name: "Maim", potency: 280 },
-            { name: "Storm's Eye", potency: 400 },
-            { name: "Storm's Path", potency: 400 },
-            { name: "Fell Cleave", potency: 460 },
-            { name: "Inner Chaos", potency: 650 },
-            { name: "Primal Rend", potency: 700 },
-            { name: "Upheaval", potency: 350 },
-            { name: "Onslaught", potency: 150 }
+            { name: "Fast Blade", potency: 200 },
+            { name: "Riot Blade", potency: 300 },
+            { name: "Goring Blade", potency: 250, dotpotency: 455 },
+            { name: "Royal Authority", potency: 420 },
+            { name: "Atonement", potency: 420 },
+            { name: "Holy Spirit", potency: 270 },
+            { name: "Confiteor", potency: 900 },
+            { name: "Blade of Faith", potency: 420 },
+            { name: "Balde of Truth", potency: 500 },
+            { name: "Blade of Valor", potency: 580, dotpotency: 560 },
+            { name: "Circle of Scorn", potency: 100, dotpotency: 150 },
+            { name: "Spirits Within", potency: 270 },
+            { name: "Expiacion", potency: 340 },
+            { name: "Intervene", potency: 150 },
+            { name: "Requiescat", potency: 400 }
         ];
 
         // PARTY BUFF VALUES
@@ -210,15 +215,15 @@
             let sksMod = 1 + Math.floor(130 * (SKS - baseSub) / levelMod) / 1000;
             let tenMod = CalcTenDamage(TEN);
             let gcd = CalcGCD(SKS);
-            let IRint = (gcd < 2.4 ? 26 : (gcd < 2.45 ? 25 : (gcd < 2.5 ? 24.5 : 24)));
-            let loopUse = 7 + 7 + 2.25 + 4.75 + 3.75 + 0.34;
-            let loopPot = 7 * Skills[HEAV].potency + 7 * Skills[MAIM].potency + 2.25 * Skills[EYE].potency + 4.75 * Skills[PATH].potency + 3.75 * Skills[CLEA].potency + 0.341 * Skills[CHAO].potency;
-            let loopDur = Math.max(roundTwo(IRint * gcd), 60);
-            let dmg = (((loopPot / loopUse) * (IRint - 4 - ((loopDur + 15) / 55))) + ((gcd < 2.45 ? 2 : (gcd == 2.45 ? 1.96 : (gcd == 2.46 ? 1.985 : 2))) * Skills[UPHE].potency + Skills[ONSL].potency * (loopDur / 30))) * dhMod * critMod;
-            dmg += ((3 * Skills[CLEA].potency) + (1 * Skills[REND].potency) + (((loopDur + 15) / 55) * Skills[CHAO].potency) + ((0.341 * Skills[CHAO].potency) * ((IRint - 4 - ((loopDur + 15) / 55)) / loopDur))) * 1.25 * (crate + 1.35);
-            dmg += (30 * (loopDur) * (3.36 / 3.39)) * sksMod * dhMod * critMod;
-            dmg *= wdMod * strMod * detMod * tenMod * 0.011;
-            return roundTwo(dmg / loopDur);
+            let time = roundTwo(8 * 2.5 + 17 * Math.max(gcd, 2.353));
+            let goring1 = 3 * 2.5 + 7 * Math.max(gcd, 2.353);
+            let goring2 = goring1 + 9 * Math.max(gcd, 2.353);
+            let goring3 = time + 5;
+            let dmg = 1 * (1 * Skills[FAITH].potency + 1 * Skills[TRUTH].potency + 1 * Skills[VALOR].potency + 2 * Skills[FAST].potency + 1 * Skills[RIOT].potency + 1 * Skills[ROYAL].potency + 2 * Skills[ATONE].potency) + 1.25 * (3 * Skills[RIOT].potency + 2 * Skills[GOR].potency + 2 * Skills[FAST].potency + 1 * Skills[ROYAL].potency + 3 * Skills[ATONE].potency) + 2 * (4 * Skills[HOLY].potency) + Skills[CONFI].potency;
+            dmg += 2.25 * (Skills[SCORN].potency + Skills[EXPI].potency) + 2.5 * Skills[INTER].potency + Skills[REQUI].potency;
+            dmg += ((goring1 - 5.35) / 21 * Skills[VALOR].dotpotency + 1.25 * Skills[GOR].dotpotency + 1.25 * ((goring3 - goring2 + 0.35) / 21 * Skills[GOR].dotpotency) + 2.25 * Skills[SCORN].dotpotency + 30 * (time + 25 * 0.25) * (2.24 / 2.27)) * sksMod;
+            dmg *= wdMod * strMod * critMod * dhMod * detMod * tenMod / 100;
+            return roundTwo(dmg / time);
         }
 
         // ETRO GETTER
@@ -316,7 +321,7 @@
                 writeID('tendmg', '- - - . - %');
             }
             if (dmg && str && dh && crt && det && ten && sks) {
-                avgdps = Damage(dmg, 105, str, det, crt, dh, ten, sks, 5);
+                avgdps = Damage(dmg, 100, str, det, crt, dh, ten, sks, 5);
                 writeID('avgdps', avgdps.toFixed(1) + 'dps');
             } else {
                 avgdps = avghps = 0;
@@ -343,7 +348,7 @@
             refsps = getID('refsks');
             if (refdmg && refstr && refdh && refcrt && refdet && reften && refsks) {
                 refgcd = CalcGCD(refsks);
-                refdps = Damage(refdmg, 105, refstr, refdet, refcrt, refdh, reften, refsks, 5);
+                refdps = Damage(refdmg, 100, refstr, refdet, refcrt, refdh, reften, refsks, 5);
             } else {
                 refdps = 0;
             }
