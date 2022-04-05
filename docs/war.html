@@ -8,7 +8,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>DNC QuickCalc</title>
+    <title>WAR QuickCalc</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Google Fonts -->
@@ -26,7 +26,7 @@
     <p></p>
     <div class="container">
         <div class="row">
-            <h1>DNC Stat Calculator ver 6.08</h1>
+            <h1>WAR Stat Calculator ver 6.05</h1>
         </div>
         <div class="row">
             <div class="column">
@@ -52,14 +52,16 @@
                     <fieldset>
                         <label for="refdmg">DMG</label>
                         <input type="number" name="refdmg" id="refdmg" placeholder="DMG" min="1" max="9999">
-                        <label for="refdex">DEX</label>
-                        <input type="number" name="refdex" id="refdex" placeholder="DEX" min="1" max="9999">
+                        <label for="refstr">STR</label>
+                        <input type="number" name="refstr" id="refstr" placeholder="STR" min="1" max="9999">
                         <label for="refdh">DH</label>
                         <input type="number" name="refdh" id="refdh" placeholder="DH" min="1" max="9999">
                         <label for="refcrt">CRT</label>
                         <input type="number" name="refcrt" id="refcrt" placeholder="CRT" min="1" max="9999">
                         <label for="refdet">DET</label>
                         <input type="number" name="refdet" id="refdet" placeholder="DET" min="1" max="9999">
+                        <label for="reften">TEN</label>
+                        <input type="number" name="reften" id="reften" placeholder="TEN" min="1" max="9999">
                         <label for="refsks">SKS</label>
                         <input type="number" name="refsks" id="refsks" placeholder="SKS" min="1" max="9999">
                     </fieldset>
@@ -72,14 +74,16 @@
                     <fieldset>
                         <label for="dmg">DMG</label>
                         <input type="number" name="dmg" id="dmg" placeholder="DMG" min="1" max="9999">
-                        <label for="dex">DEX</label>
-                        <input type="number" name="dex" id="dex" placeholder="DEX" min="1" max="9999">
+                        <label for="str">STR</label>
+                        <input type="number" name="str" id="str" placeholder="STR" min="1" max="9999">
                         <label for="dh">DH</label>
                         <input type="number" name="dh" id="dh" placeholder="DH" min="1" max="9999">
                         <label for="crt">CRT</label>
                         <input type="number" name="crt" id="crt" placeholder="CRT" min="1" max="9999">
                         <label for="det">DET</label>
                         <input type="number" name="det" id="det" placeholder="DET" min="1" max="9999">
+                        <label for="ten">TEN</label>
+                        <input type="number" name="ten" id="ten" placeholder="TEN" min="1" max="9999">
                         <label for="sks">SKS</label>
                         <input type="number" name="sks" id="sks" placeholder="SKS" min="1" max="9999">
                     </fieldset>
@@ -111,6 +115,10 @@
                             <td id="detdmg">Det DMG</td>
                         </tr>
                         <tr>
+                            <th>Ten DMG</th>
+                            <td id="tendmg">Ten DMG</td>
+                        </tr>
+                        <tr>
                             <th>Avg DPS</th>
                             <td id="avgdps">Avg DPS</td>
                         </tr>
@@ -125,34 +133,40 @@
     </div>
     <script>
         // INITIALIZE VARS
-        var dmg = 0, dex = 0, dh = 0, crt = 0, det = 0, sks = 0;
-        var gcd = 0, crate = 0, cdmg = 0, dhrate = 0, detdmg = 0, avgdps = 0, reldps = 0;
-        var refdmg = 0, refdex = 0, refdh = 0, refcrt = 0, refdet = 0, refsks = 0, refdps = 0, refgcd = 0;
-        const setSavage = [120, 2572, 1417, 1582, 1225, 602], setTome = [119, 2564, 1318, 1433, 1468, 602];
+        var dmg = 0, str = 0, dh = 0, crt = 0, det = 0, ten = 0, sks = 0;
+        var gcd = 0, crate = 0, cdmg = 0, dhrate = 0, detdmg = 0, tendmg = 0, avgdps = 0, reldps = 0;
+        var refdmg = 0, refstr = 0, refdh = 0, refcrt = 0, refdet = 0, reften = 0, refsks = 0, refdps = 0, refgcd = 0;
+        const setSavage = [120, 2533, 400, 1342, 1646, 1109, 729], setTome = [119, 2641, 400, 1508, 1626, 996, 691];
 
-        const CASC = 0, FOUN = 1, REVC = 2, FOFA = 3, SABD = 4, STAD = 5, STDF = 6, TECF = 7, TILL = 8, FD1 = 9, FD3 = 10, FD4 = 11, AUTO = 12,
-            QTY = [
-                [0, 0.7048, 0.5286, 1.1008, 1.6512, 5.7793],
-                [0, 0.7048, 0.5286, 1.1008, 1.6512, 5.7793],
-                [0, 0.9238, 0.6929, 0.6794, 1.0192, 3.5671],
-                [0, 0.9238, 0.6929, 0.6794, 1.0192, 3.5671],
-                [0, 0.7429, 0.5571, 0.4395, 0.6592, 2.3072],
-                [0, 1, 0, 0, 0, 0],
-                [0, 0, 0, 0, 1, 2],
-                [1, 0, 0, 0, 0, 0],
-                [0, 1, 0, 0, 0, 0],
-                [0, 3.4625, 1.1542, 0.2923, 0.2923, 1.6810],
-                [0, 2.7313, 0.5771, 0.2752, 1.2752, 0.5824],
-                [0, 1, 0, 0, 1, 0],
-                [0, 4.8077, 1.6026, 3.2051, 4.8077, 0]
-            ],
-            POTENCY = [220, 280, 280, 340, 480, 600, 720, 1200, 360, 150, 200, 300, 93.6];
+        const TOMA = 0, HEAV = 1, MAIM = 2, EYE = 3, PATH = 4, CLEA = 5, CHAO = 6, REND = 7, UPHE = 8, ONSL = 9;
+        const Skills = [
+            { name: "Tomahawk", potency: 150 },
+            { name: "Heavy Swing", potency: 200 },
+            { name: "Maim", potency: 280 },
+            { name: "Storm's Eye", potency: 400 },
+            { name: "Storm's Path", potency: 400 },
+            { name: "Fell Cleave", potency: 460 },
+            { name: "Inner Chaos", potency: 650 },
+            { name: "Primal Rend", potency: 700 },
+            { name: "Upheaval", potency: 350 },
+            { name: "Onslaught", potency: 150 }
+        ];
+
+        // PARTY BUFF VALUES
+        const battleVoiceAvg = 0.025;
+        const battleLitanyAvg = 0.0125;
+        const chainStratAvg = 0.0125;
+        const devilmentAvg = 0.033333;
+        const brdCritAvg = 0.0075;
+        const brdDhAvg = 0.01125;
+
+        // TRAITS
+        const magicAndMend = 1.3;
 
         // JOBMOD ETC
         const levelMod = 1900;
         const baseMain = 390;
         const baseSub = 400;
-        const jobMod = 115;
         const APdiv = 195;
 
         function CalcCritRate(Crit) {
@@ -160,7 +174,7 @@
         }
 
         function CalcCritDamage(Crit) {
-            return (Math.floor(200 * (Crit - baseSub) / levelMod) + baseSub) / 1000;
+            return (Math.floor(200 * (Crit - baseSub) / levelMod) + 50) / 1000;
         }
 
         function CalcDHRate(DH) {
@@ -168,7 +182,11 @@
         }
 
         function CalcDetDamage(Det) {
-            return roundThree(1 + 140 * (Det - baseMain) / levelMod / 1000);
+            return 1 + Math.floor(140 * (Det - baseMain) / levelMod) / 1000;
+        }
+
+        function CalcTenDamage(Ten) {
+            return 1 + Math.floor(100 * (Ten - baseSub) / levelMod) / 1000;
         }
 
         function CalcGCD(Sks) {
@@ -179,40 +197,28 @@
             return Math.round(NUM * 100) / 100;
         }
 
-        function roundThree(NUM) {
-            return Math.round(NUM * 1000) / 1000;
-        }
-
         // DPS AND HPS RELATED CALCULATIONS
-        function calcDmg(WD, DEX, DH, CRT, DET, SKS, BONUS) {
-            let dmgSum = 0;
-            let myGCD = CalcGCD(SKS);
-            let myDEX = Math.floor(DEX * (1 + 0.01 * BONUS));
-            let wdMod = WD + Math.floor(baseMain * 115 / 1000);
+        function Damage(WD, JobMod, STR, DET, CRT, DH, TEN, SKS, classNum) {
+            let strMod = Math.floor(156 * (Math.floor(STR * (1 + 0.01 * classNum)) - baseMain) / baseMain + 100) / 100;
+            let wdMod = WD + Math.floor(baseMain * JobMod / 1000);
             let detMod = CalcDetDamage(DET);
             let crate = CalcCritRate(CRT);
             let cdmg = CalcCritDamage(CRT);
+            let critMod = 1 + crate * (crate + 0.35);
             let dhrate = CalcDHRate(DH);
-            let critMod = 1 + crate * cdmg;
-            let critModPlus = 1 + (crate + 0.2) * cdmg;
             let dhMod = 1 + dhrate * 0.25;
-            let dhModPlus = 1 + (dhrate + 0.2) * 0.25;
-            let apMod = roundThree(1 + APdiv * (myDEX * 1.01 - baseMain) / baseMain / 100);
-            let sksMod = roundThree(1 / (1 - Math.floor(130 * (SKS - baseSub) / levelMod) / 1000));
-            let time = Math.max(roundThree(39 * myGCD + 8.5 + 15 + 39 * 0.008 + 9 * 0.008 + 10 * 0.008),120);
-
-            QTY.forEach((element, index) => {
-                dmgSum += element[0] * POTENCY[index] * apMod * detMod * wdMod * (index == STAD ? (1 + cdmg) * 1.25 : critMod * dhMod) * (index == AUTO ? sksMod * 0.0105 : 0.0126);
-                dmgSum += element[1] * POTENCY[index] * apMod * detMod * wdMod * (index == STAD ? (1 + cdmg) * 1.25 : critModPlus * dhModPlus) * (index == AUTO ? sksMod * 0.011025 : 0.01323);
-                dmgSum += element[2] * POTENCY[index] * apMod * detMod * wdMod * (index == STAD ? (1 + cdmg) * 1.25 : critModPlus * dhModPlus) * (index == AUTO ? sksMod * 0.011025 : 0.01323);
-                dmgSum += element[3] * POTENCY[index] * apMod * detMod * wdMod * (index == STAD ? (1 + cdmg) * 1.25 : critMod * dhMod) * (index == AUTO ? sksMod * 0.0105 : 0.0126);
-                dmgSum += element[4] * POTENCY[index] * apMod * detMod * wdMod * (index == STAD ? (1 + cdmg) * 1.25 : critMod * dhMod) * (index == AUTO ? sksMod * 0.0105 : 0.0126);
-                dmgSum += element[5] * POTENCY[index] * apMod * detMod * wdMod * (index == STAD ? (1 + cdmg) * 1.25 : critMod * dhMod) * (index == AUTO ? sksMod * 0.0105 : 0.0126);
-            });
-            dmgSum += (time / 3.12 - 14.424) * POTENCY[AUTO] * apMod * detMod * wdMod * critMod * dhMod * sksMod * 0.0105;
-            dmgSum *= 0.9991; // Rounding adjustment
-
-            return roundTwo(dmgSum / time);
+            let sksMod = 1 + Math.floor(130 * (SKS - baseSub) / levelMod) / 1000;
+            let tenMod = CalcTenDamage(TEN);
+            let gcd = CalcGCD(SKS);
+            let IRint = (gcd < 2.4 ? 26 : (gcd < 2.45 ? 25 : (gcd < 2.5 ? 24.5 : 24)));
+            let loopUse = 7 + 7 + 2.25 + 4.75 + 3.75 + 0.34;
+            let loopPot = 7 * Skills[HEAV].potency + 7 * Skills[MAIM].potency + 2.25 * Skills[EYE].potency + 4.75 * Skills[PATH].potency + 3.75 * Skills[CLEA].potency + 0.341 * Skills[CHAO].potency;
+            let loopDur = Math.max(roundTwo(IRint * gcd), 60);
+            let dmg = (((loopPot / loopUse) * (IRint - 4 - ((loopDur + 15) / 55))) + ((gcd < 2.45 ? 2 : (gcd == 2.45 ? 1.96 : (gcd == 2.46 ? 1.985 : 2))) * Skills[UPHE].potency + Skills[ONSL].potency * (loopDur / 30))) * dhMod * critMod;
+            dmg += ((3 * Skills[CLEA].potency) + (1 * Skills[REND].potency) + (((loopDur + 15) / 55) * Skills[CHAO].potency) + ((0.341 * Skills[CHAO].potency) * ((IRint - 4 - ((loopDur + 15) / 55)) / loopDur))) * 1.25 * (crate + 1.35);
+            dmg += (30 * (loopDur) * (3.36 / 3.39)) * sksMod * dhMod * critMod;
+            dmg *= wdMod * strMod * detMod * tenMod * 0.011;
+            return roundTwo(dmg / loopDur);
         }
 
         // ETRO GETTER
@@ -241,10 +247,11 @@
 
             return [
                 response.find((elem) => elem.name == "Weapon Damage").value,
-                response.find((elem) => elem.name == "DEX").value,
+                response.find((elem) => elem.name == "STR").value,
                 response.find((elem) => elem.name == "DH").value,
                 response.find((elem) => elem.name == "CRT").value,
                 response.find((elem) => elem.name == "DET").value,
+                response.find((elem) => elem.name == "TEN").value,
                 response.find((elem) => elem.name == "SKS").value
             ];
         }
@@ -296,11 +303,23 @@
             } else {
                 writeID('detdmg', '- - - . - %');
             }
-            if (dmg && dex && dh && crt && det && sks) {
-                avgdps = calcDmg(dmg, dex, dh, crt, det, sks, 0);
+            if (det) {
+                detdmg = CalcDetDamage(det);
+                writeID('detdmg', (detdmg * 100).toFixed(1) + '%');
+            } else {
+                writeID('detdmg', '- - - . - %');
+            }
+            if (ten) {
+                tendmg = CalcTenDamage(ten);
+                writeID('tendmg', (tendmg * 100).toFixed(1) + '%');
+            } else {
+                writeID('tendmg', '- - - . - %');
+            }
+            if (dmg && str && dh && crt && det && ten && sks) {
+                avgdps = Damage(dmg, 105, str, det, crt, dh, ten, sks, 5);
                 writeID('avgdps', avgdps.toFixed(1) + 'dps');
             } else {
-                avgdps = 0;
+                avgdps = avghps = 0;
                 writeID('avgdps', '- - - - . - dps');
             }
             printRel();
@@ -317,14 +336,14 @@
 
         function getRefs() {
             refdmg = getID('refdmg');
-            refmnd = getID('refdex');
+            refmnd = getID('refstr');
             refdh = getID('refdh');
             refcrt = getID('refcrt');
             refdet = getID('refdet');
             refsps = getID('refsks');
-            if (refdmg && refdex && refdh && refcrt && refdet && refsks) {
+            if (refdmg && refstr && refdh && refcrt && refdet && reften && refsks) {
                 refgcd = CalcGCD(refsks);
-                refdps = calcDmg(refdmg, refdex, refdh, refcrt, refdet, refsks, 0);
+                refdps = Damage(refdmg, 105, refstr, refdet, refcrt, refdh, reften, refsks, 5);
             } else {
                 refdps = 0;
             }
@@ -333,23 +352,25 @@
 
         function writeRef(statArr) {
             writeIDval('refdmg', statArr[0]);
-            writeIDval('refdex', statArr[1]);
+            writeIDval('refstr', statArr[1]);
             writeIDval('refdh', statArr[2]);
             writeIDval('refcrt', statArr[3]);
             writeIDval('refdet', statArr[4]);
-            writeIDval('refsks', statArr[5]);
-            [refdmg, refdex, refdh, refcrt, refdet, refsks] = statArr;
+            writeIDval('reften', statArr[5]);
+            writeIDval('refsks', statArr[6]);
+            [refdmg, refstr, refdh, refcrt, refdet, reften, refsks] = statArr;
             getRefs();
         }
 
         function writeStats(statArr) {
             writeIDval('dmg', statArr[0]);
-            writeIDval('dex', statArr[1]);
+            writeIDval('str', statArr[1]);
             writeIDval('dh', statArr[2]);
             writeIDval('crt', statArr[3]);
             writeIDval('det', statArr[4]);
-            writeIDval('sks', statArr[5]);
-            [dmg, dex, dh, crt, det, sks] = statArr;
+            writeIDval('ten', statArr[5]);
+            writeIDval('sks', statArr[6]);
+            [dmg, str, dh, crt, det, ten, sks] = statArr;
             getDPS();
         }
 
@@ -369,9 +390,9 @@
                 getDPS();
             }
         })
-        document.querySelector('#dex').addEventListener('change', (event) => {
+        document.querySelector('#str').addEventListener('change', (event) => {
             if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
-                dex = event.target.valueAsNumber;
+                str = event.target.valueAsNumber;
                 getDPS();
             }
         })
@@ -390,6 +411,12 @@
         document.querySelector('#det').addEventListener('change', (event) => {
             if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
                 det = event.target.valueAsNumber;
+                getDPS();
+            }
+        })
+        document.querySelector('#ten').addEventListener('change', (event) => {
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                ten = event.target.valueAsNumber;
                 getDPS();
             }
         })
