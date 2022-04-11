@@ -26,7 +26,7 @@
     <p></p>
     <div class="container">
         <div class="row">
-            <h1>MCH Stat Calculator ver 6.08</h1>
+            <h1>MCH Stat Calculator ver 6.10</h1>
         </div>
         <div class="row">
             <div class="column">
@@ -134,21 +134,21 @@
         const REA = 0, DR = 1, GR = 2, RICO = 3, AIR = 4, BS = 5, CS = 6, WF = 7, HC = 8, HB = 9, AQ = 10, C = 11;
         const SKILLS = [
             { name: "Reassemble", gcd: 0, potency: 0 },
-            { name: "Drill", gcd: 2.5, potency: 570 },
+            { name: "Drill", gcd: 2.5, potency: 580 },
             { name: "Gauss Round", gcd: 0, potency: 120 },
             { name: "Ricochet", gcd: 0, potency: 120 },
-            { name: "Air Anchor", gcd: 2.5, potency: 570 },
+            { name: "Air Anchor", gcd: 2.5, potency: 580 },
             { name: "Barrel Stabilizer", gcd: 0, potency: 0 },
             { name: "Chain Saw", gcd: 2.5, potency: 0 },
             { name: "Wildfire", gcd: 0, potency: 0, duration: 10 },
             { name: "Hypercharge", gcd: 0, potency: 0, duration: 8 },
-            { name: "Heat Blast", gcd: 1.5, potency: 170 },
+            { name: "Heat Blast", gcd: 1.5, potency: 180 },
             { name: "Automaton Queen", gcd: 0, potency: 0, duration: 20 },
             { name: "Heated Split Shot", gcd: 2.5, potency: 200 },
             { name: "Heated Slug Shot", gcd: 2.5, potency: 280 },
             { name: "Heated Clean Shot", gcd: 2.5, potency: 360 }
         ];
-        const Q_PUNCH = 120, Q_DELAY = 5, Q_MULT = 1.5, Q_OVER = 1400, Q_DASH = 240;
+        const Q_PUNCH = 120, Q_DELAY = 5, Q_MULT = 1.5, Q_OVER = 1460, Q_DASH = 240;
 
         const ROTATO250 = 0, ROTATO244 = 1, ROTATO238 = 2;
         const ROTATO = [
@@ -205,7 +205,7 @@
 
         // DPS AND HPS RELATED CALCULATIONS
         function calcRotato(WD, DEX, DH, CRT, DET, SKS, BONUS, PRECAST) {
-            let time = 0, lastTime = 0, myTime = 0, delay = 2.64, reaBuff = false, wfTime = 0, hcTime = 0, shotOffset = 0, dmgSum = 0, batt = 0, queenPot = 0, queenDmg = 0;
+            let time = 0, lastTime = 0, myTime = 0, delay = 2.64, reaBuff = false, wfTime = 0, hcTime = 0, shotOffset = 0, dmgSum = 0, batt = 0, queenTime = 0, queenDur = 0, queenPot = 0, queenDmg = 0;
             let myGCD = CalcGCD(SKS);
             let rot = (myGCD < 2.44 ? (myGCD < 2.38 ? ROTATO238 : ROTATO244) : ROTATO250);
             let myDEX = Math.floor(DEX * (1 + 0.01 * BONUS));
@@ -247,7 +247,7 @@
                 if (element == WF) wfTime = skill.duration;
                 if (element == HC) hcTime = skill.duration;
                 dmg = Math.floor(Math.floor((skill.potency + (hcTime > 0.75 && skill.gcd ? 20 : 0)) / 100 * wdMod * apMod * detMod * 1.2) * (reaBuff && skill.gcd ? (1 + cdmg) * 1.25 : critMod * dhMod));
-                if (wfTime && skill.gcd) dmg += Math.floor(150 / 100 * wdMod * apMod * detMod * sksMod * 1.2);
+                if (wfTime && skill.gcd) dmg += Math.floor(200 / 100 * wdMod * apMod * detMod * sksMod * 1.2);
                 dmgSum += dmg;
                 if (reaBuff && skill.gcd) reaBuff = false;
                 if (index >= PRECAST && skill.gcd) {

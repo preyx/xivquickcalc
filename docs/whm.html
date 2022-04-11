@@ -23,10 +23,10 @@
     <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
+    <p></p>
     <div class="container">
-        <p></p>
         <div class="row">
-            <h1>WHM Stat Calculator ver 6.08</h1>
+            <h1>WHM Stat Calculator ver 6.10</h1>
         </div>
         <div class="row">
             <div class="column">
@@ -156,7 +156,7 @@
         const dia = 60;
         const diaDot = 60;
         const assize = 400;
-        const misery = 900;
+        const misery = 1240;
 
         // PARTY BUFF VALUES
         const battleVoiceAvg = 0.025;
@@ -206,10 +206,10 @@
             result += assize * cycle * 0.022222;
             result += lillies * misery * cycle * 0.0055555;
             if (glare - dia > diaDot / 3 * SpsScalar(sps) * Math.floor(30 / shortGcd) * (shortGcd - 30 % shortGcd)) {
-                result += 12 * (Math.ceil(30 / shortGcd) - 1) * glare + 12 * dia - 6 * lillies * glare;
+                result += 12 * (Math.ceil(30 / shortGcd) - 1) * glare + 12 * dia - 12 * (lillies / 2) * glare;
                 result += 120 * SpsScalar(sps) * diaDot;
             } else {
-                result += 12 * (Math.floor(30 / shortGcd) - 1) * glare + 12 * dia - 6 * lillies * glare;
+                result += 12 * (Math.floor(30 / shortGcd) - 1) * glare + 12 * dia - 12 * (lillies / 2) * glare;
                 result += 108 * SpsScalar(sps) * diaDot;
                 result += 12 * ((3 - (30 % shortGcd)) / 3) * SpsScalar(sps) * diaDot;
             }
@@ -224,22 +224,19 @@
             } else {
                 result = Math.floor(30 / shortGcd) * 4800 - lillies * 2400;
             }
-            result = result - cycle * 11.111 - LDs * cycle * 64.167 + rezz * cycle * 33.333 + m2s * cycle * 10 + c3s * cycle * 18.333 - cycle * 6.6667;
+            result += cycle * (rezz * 33.333 + m2s * 10 + c3s * 18.333 - LDs * 64.167 - 17.778);
             return result;
         }
 
         // Actual time taken by a 360s rotation
         function getCycle(shortGcd, sps, lillies) {
             let result = 0;
-            //1 dia + x glares
             if (glare - dia > diaDot / 3 * SpsScalar(sps) * Math.floor(30 / shortGcd) * (shortGcd - 30 % shortGcd)) {
                 result = 12 * (Math.ceil(30 / shortGcd) * shortGcd);
             } else {
                 result = 12 * (Math.floor(30 / shortGcd) * shortGcd);
             }
-            //miseries
             result += 2 * lillies * shortGcd;
-            // POM as multiplier normalized over 360s
             result *= 0.9697;
             return result;
         }
@@ -308,6 +305,7 @@
                 // 404, couldn't get the set
                 return false;
             }
+
             response = response.totalParams;
 
             return [
@@ -342,8 +340,8 @@
 
         function getDPS() {
             if (sps) {
-                gcd = Math.floor(0.250 * (1000 - Math.floor(130 * (sps - baseSub) / levelMod))) / 100;
-                pom = Math.floor(0.200 * (1000 - Math.floor(130 * (sps - baseSub) / levelMod))) / 100;
+                gcd = Math.floor(0.250 * (1000 - Math.floor(130 * (sps - 400) / 1900))) / 100;
+                pom = Math.floor(0.200 * (1000 - Math.floor(130 * (sps - 400) / 1900))) / 100;
                 ppsx = pps(sps, gcd, c3rate, m2rate, resrate, lilyrate);
                 writeID('gcd', gcd.toFixed(2) + 's');
                 writeID('pom', pom.toFixed(2) + 's');
@@ -460,31 +458,46 @@
         }
 
         document.querySelector('#dmg').addEventListener('change', (event) => {
-            if (dmg = getID('dmg')) getDPS();
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                dmg = event.target.valueAsNumber;
+                getDPS();
+            }
         })
-
         document.querySelector('#mnd').addEventListener('change', (event) => {
-            if (mnd = getID('mnd')) getDPS();
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                mnd = event.target.valueAsNumber;
+                getDPS();
+            }
         })
-
         document.querySelector('#pie').addEventListener('change', (event) => {
-            if (pie = getID('pie')) getDPS();
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                pie = event.target.valueAsNumber;
+                getDPS();
+            }
         })
-
         document.querySelector('#dh').addEventListener('change', (event) => {
-            if (dh = getID('dh')) getDPS();
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                dh = event.target.valueAsNumber;
+                getDPS();
+            }
         })
-
         document.querySelector('#crt').addEventListener('change', (event) => {
-            if (crt = getID('crt')) getDPS();
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                crt = event.target.valueAsNumber;
+                getDPS();
+            }
         })
-
         document.querySelector('#det').addEventListener('change', (event) => {
-            if (det = getID('det')) getDPS();
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                det = event.target.valueAsNumber;
+                getDPS();
+            }
         })
-
         document.querySelector('#sps').addEventListener('change', (event) => {
-            if (sps = getID('sps')) getDPS();
+            if (event.target.valueAsNumber > 0 && event.target.valueAsNumber < 10000) {
+                sps = event.target.valueAsNumber;
+                getDPS();
+            }
         })
 
         document.querySelector('#calcref').addEventListener('click', (event) => {
