@@ -305,7 +305,12 @@
         }
 
         async function getJson(setID) {
-            let response = await fetch(`https://etro.gg/api/gearsets/${gearset}/`)
+            let response = await fetch(`https://etro.gg/api/gearsets/${setID}/`)
+            return await response.json();
+        }
+
+        async function getJsonItem(itemID) {
+            let response = await fetch(`https://etro.gg/api/equipment/${itemID}/`)
             return await response.json();
         }
 

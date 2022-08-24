@@ -324,23 +324,28 @@
             let regex = RegExp("https:\/\/etro\.gg\/gearset\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})")
             let exec = regex.exec(url);
             if (exec === null) {
-                // TODO handle case where gearset has an invalid URL
                 return false;
             }
-            gearset = exec[1];
+            let gearset = exec[1];
 
             let response;
             try {
                 response = await getJson(gearset);
             } catch (e) {
-                // 404, couldn't get the set
+                return false;
+            }
+
+            let weapResponse;
+            try {
+                weapResponse = await getJsonItem(response.weapon);
+            } catch (e) {
                 return false;
             }
 
             response = response.totalParams;
 
             return [
-                response.find((elem) => elem.name == "Weapon Damage").value,
+                (weapResponse.damageMag > weapResponse.damagePhys ? weapResonse.damageMag : weapResponse.damagePhys),
                 response.find((elem) => elem.name == "INT").value,
                 response.find((elem) => elem.name == "DH").value,
                 response.find((elem) => elem.name == "CRT").value,
@@ -350,7 +355,12 @@
         }
 
         async function getJson(setID) {
-            let response = await fetch(`https://etro.gg/api/gearsets/${gearset}/`)
+            let response = await fetch(`https://etro.gg/api/gearsets/${setID}/`)
+            return await response.json();
+        }
+
+        async function getJsonItem(itemID) {
+            let response = await fetch(`https://etro.gg/api/equipment/${itemID}/`)
             return await response.json();
         }
 
