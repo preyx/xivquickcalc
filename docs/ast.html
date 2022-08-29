@@ -288,18 +288,10 @@
             } catch (e) {
                 return false;
             }
-
-            let weapResponse;
-            try {
-                weapResponse = await getJsonItem(response.weapon);
-            } catch (e) {
-                return false;
-            }
-
             response = response.totalParams;
 
             return [
-                (weapResponse.damageMag > weapResponse.damagePhys ? weapResonse.damageMag : weapResponse.damagePhys),
+                response.find((elem) => elem.name == "Weapon Damage").value,
                 response.find((elem) => elem.name == "MND").value,
                 response.find((elem) => elem.name == "PIE").value,
                 response.find((elem) => elem.name == "DH").value,
@@ -311,11 +303,6 @@
 
         async function getJson(setID) {
             let response = await fetch(`https://etro.gg/api/gearsets/${setID}/`)
-            return await response.json();
-        }
-
-        async function getJsonItem(itemID) {
-            let response = await fetch(`https://etro.gg/api/equipment/${itemID}/`)
             return await response.json();
         }
 

@@ -309,11 +309,6 @@
             return await response.json();
         }
 
-        async function getJsonItem(itemID) {
-            let response = await fetch(`https://etro.gg/api/equipment/${itemID}/`)
-            return await response.json();
-        }
-
         // PAGE FUNCTIONS
         function writeID(ID, toWrite) {
             document.querySelector('#' + ID).textContent = String(toWrite);
